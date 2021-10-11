@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>首页</h1>
+<div style="background-color: green">
+
+    <a style="color: red;font-size: 50px" th:href="@{/requestMapping}"><b>跳转成功页面</b></a>
+    <a style="color: blue;font-size: 50px" th:href="@{/test}"><b>跳转test页面</b></a>
+    <a style="color: cadetblue;font-size: 50px" th:href="@{/213}"><b>跳转213页面</b></a>
+    <form th:action="@{/requestMapping}" method="post">
+        <input type="submit">
+    </form>
+    <a style="color: cadetblue;font-size: 50px" th:href="@{/testParams(username='admin')}">测试param</a>
+    <a style="color: cadetblue;font-size: 50px" th:href="@{/testPath/1}">占位符测试</a>
+    <a style="color: cadetblue;font-size: 50px" th:href="@{/testServletAPI}">测试session</a>
+</div>
+
+</body>
+</html>

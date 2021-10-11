@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
+         version="4.0">
+
+<!--    默认配置方式
+    默认配置文件应置于WEB-INFO下
+-->
+<!--   配置前端控制器-->
+<!--    <servlet>-->
+<!--        <servlet-name>springMVC</servlet-name>-->
+<!--        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>-->
+<!--    </servlet>-->
+<!--    <servlet-mapping>-->
+<!--        <servlet-name>springMVC</servlet-name>-->
+<!--&lt;!&ndash;-->
+<!--    设置springMVC的核心控制器所能处理的请求的请求路径-->
+<!--    /所匹配的请求可以是任意.html/.js/.css方式的请求路径-->
+<!--    但是/不能匹配.jsp的请求路径-->
+<!--    /*包括.jsp的请求-->
+<!--&ndash;&gt;-->
+<!--        <url-pattern>/</url-pattern>-->
+<!--    </servlet-mapping>-->
+<!--    扩展配置方式-->
+    <servlet>
+        <servlet-name>springMVC</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+<!--        配置springMVC配置文件的位置和名称-->
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>classpath:springMVC.xml</param-value>
+        </init-param>
+<!--        将前端控制器DispatchServlet的初始化时间提前到服务器启动时-->
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>springMVC</servlet-name>
+        <!--
+            设置springMVC的核心控制器所能处理的请求的请求路径
+            /所匹配的请求可以是任意.html/.js/.css方式的请求路径
+            但是/不能匹配.jsp的请求路径
+            /*包括.jsp的请求
+        -->
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+</web-app>

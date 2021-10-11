@@ -1,0 +1,22 @@
+server:
+  port: 8080
+bee:
+  db:
+    driverName : com.mysql.jdbc.Driver
+    url: jdbc:mysql://47.94.231.7:3307/test?characterEncoding=UTF-8
+    username: root
+    password: 123456
+spring:
+  datasource:
+    logSlowSql: true
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://47.94.231.7:3307/test?characterEncoding=utf-8&serverTimezone=GMT%2B8&useTimezone=true&allowMultiQueries=true
+    type: com.alibaba.druid.pool.DruidDataSource
+    username: root
+    password: 123456
+    maxPoolPreparedStatementPerConnectionSize: 20
+    poolPreparedStatements: true
+    minEvictableIdleTimeMillis: 300000
+    timeBetweenEvictionRunsMillis: 60000
+    maxWait: 60000
+    maxActive: 10000
