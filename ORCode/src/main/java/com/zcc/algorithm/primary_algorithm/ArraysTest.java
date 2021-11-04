@@ -1,7 +1,9 @@
-package com.zcc.algorithm;
+package com.zcc.algorithm.primary_algorithm;
 
 import java.io.FileNotFoundException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ArraysTest {
 
