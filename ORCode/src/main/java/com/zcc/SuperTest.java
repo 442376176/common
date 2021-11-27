@@ -1,6 +1,8 @@
 package com.zcc;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class SuperTest extends Date {
     private static final long serialVersionUID = 1L;
@@ -9,7 +11,14 @@ public class SuperTest extends Date {
     }
 
     public static void main(String[]args){
-        new SuperTest().test();
+        List<String> listA = new ArrayList<String>();
+        List<String> listB = new ArrayList<String>();
+        listA.add("A");
+        listA.add("B");
+        listB.add("d");
+        listB.add("C");
+        listA.retainAll(listB);
+        System.out.println(listA);
     }
 }
     
