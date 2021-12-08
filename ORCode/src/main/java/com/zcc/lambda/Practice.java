@@ -2,7 +2,12 @@ package com.zcc.lambda;
 
 import com.zcc.entity.Book;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.function.*;
+import java.util.stream.Collectors;
 
 /**
  * @author zcc
@@ -11,10 +16,13 @@ import java.util.function.*;
  */
 public class Practice {
 
-
+    // 操作
     private static BinaryOperator<Long> add = (x, y) -> x + y;
+    // 函数
     private static Function<Long, Long> reduce = x -> x - 1;
+    // 双函数
     private static BiFunction<Long, Long, Long> longLongLongBiFunction = add.andThen(reduce);
+    // 消费
     private static Consumer<Book> consumer1 = x -> x.setId(14);
     private static Consumer<Book> consumer2 = x -> x.setName("测试消费者");
     private static Consumer<Book> bookConsumer = consumer1.andThen(consumer2);
@@ -25,48 +33,48 @@ public class Practice {
 
 
         public static void main (String[]args){
-//            String msgA = "Hello ";
-//            String msgB = "World ";
-//            System.out.println(
-//                    getString(
-//                            () -> msgA + msgB
-//                    )
-//            );
-//            reduce.apply();
-//            reduce.compose();
-//            reduce.andThen();
-//            List<Book> list = new ArrayList<>();
-//            for (int i = 0; i < 10; i++) {
-//                Book book = new Book();
-//                book.setId(i);
-//                list.add(book);
-//            }
-//            Map<Integer, Book> collect = list.stream().filter(item -> item.getId() < 5).collect(Collectors.toMap(Book::getId, Function.identity()));
-//            System.out.println(collect);
+            String msgA = "Hello ";
+            String msgB = "World ";
+            System.out.println(
+                    getString(
+                            () -> msgA + msgB
+                    )
+            );
+            reduce.apply(5L);
+            Function<Long, Long> compose = reduce.compose(reduce);
+            Function<Long, Long> longLongFunction = reduce.andThen(compose);
+            List<Book> list = new ArrayList<>();
+            for (int i = 0; i < 10; i++) {
+                Book book = new Book();
+                book.setId(i);
+                list.add(book);
+            }
+            Map<Integer, Book> collect = list.stream().filter(item -> item.getId() < 5).collect(Collectors.toMap(Book::getId, Function.identity()));
+            System.out.println(collect);
 
-//            System.out.println(predicate.test("4"));
-//            Predicate<String> and = predicate.and(str -> str.equals("4"));
-//            System.out.println(and.test("5"));
-//            System.out.println(predicate.negate().test("4"));
-//            System.out.println(predicate.or(str -> str.equals("4")).test("4"));
-//            System.out.println(String.valueOf(new Date().getTime()));
-//            ThreadLocal<String> stringThreadLocal = ThreadLocal.withInitial(() -> "6");
-            System.out.println("Ale_dEa7_Nn_qKu4EnEttDiz591jZJa7YttM7DThCOG7".length());
-        }
+            System.out.println(predicate.test("4"));
+            Predicate<String> and = predicate.and(str -> str.equals("4"));
+            System.out.println(and.test("5"));
+            System.out.println(predicate.negate().test("4"));
+            System.out.println(predicate.or(str -> str.equals("4")).test("4"));
+            System.out.println(String.valueOf(new Date().getTime()));
+            ThreadLocal<String> stringThreadLocal = ThreadLocal.withInitial(() -> "6");
+//            System.out.println("Ale_dEa7_Nn_qKu4EnEttDiz591jZJa7YttM7DThCOG7".length());
+//        }
+//
 
+
+
+        Book book = new Book();
+        book.setId(9);
+        // 无返回
+        bookConsumer.accept(book);
+        System.out.println(book);
+        System.out.println(add.apply(5L, 9L));
+        System.out.println(longLongLongBiFunction.apply(5L, 17L));
+    }
         private static String getString(Supplier<String> stringSupplier) {
             return stringSupplier.get();
         }
-
-
-//        Book book = new Book();
-//        book.setId(9);
-//        // 无返回
-//        bookConsumer.accept(book);
-//        System.out.println(book);
-//        System.out.println(add.apply(5L, 9L));
-//        System.out.println(longLongLongBiFunction.apply(5L, 17L));
-//    }
-
 
 }
