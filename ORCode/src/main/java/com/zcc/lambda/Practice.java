@@ -65,7 +65,7 @@ public class Practice {
 
 
 
-        Book book = new Book();
+            Book book = new Book();
         book.setId(9);
         // 无返回
         bookConsumer.accept(book);

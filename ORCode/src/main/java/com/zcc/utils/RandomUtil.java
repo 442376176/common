@@ -34,4 +34,13 @@ public class RandomUtil {
         }
         return stringBuilder.toString();
     }
+    public static String getRandomNumber() {
+        StringBuilder stringBuilder = new StringBuilder();
+        Random random = new Random();
+        for (int i = 0; i < 6; i++) {
+            stringBuilder.append(random.nextInt(10));
+        }
+        return stringBuilder.toString();
+    }
+
 }

@@ -1,5 +1,6 @@
 package com.zcc.utils;
 
+import com.zcc.entity.User;
 import org.junit.Test;
 
 import java.util.*;
@@ -10,6 +11,15 @@ import java.util.*;
  * @date 2021/11/25 13:49
  */
 public class CollectionUtils<T> {
+
+    public static  Map<String, Object> map = new HashMap<>();
+    static {
+        User user = new User();
+        user.setSex("1");
+        user.setName("!");
+        map.put("1",user);
+    }
+
     /**
      * 判断集合是否为空
      *
@@ -170,8 +180,17 @@ public class CollectionUtils<T> {
 //        System.out.println(s.replace("qweqwe", "|"));
 //        StringBuffer buffer = new StringBuffer();
 //        System.out.println(buffer.toString());
-        System.out.println(System.getProperty("os.name")+": os_verson:"+System.getProperty("os.version"));
-        System.out.println(System.getenv("s"));
+
+        User user1 = new User();
+        user1.setSex("1");
+        user1.setName("!");
+        Set set = new HashSet();
+        set.add(map.get("1"));
+        set.add(user1);
+        System.out.println(set);
+
+//        System.out.println(System.getProperty("os.name")+": os_verson:"+System.getProperty("os.version"));
+//        System.out.println(System.getenv("s"));
 
 //        BiFunction<User,String,String> = (a,b,c)->{
 //

@@ -1,11 +1,15 @@
-package com.zcc.utils;
+package com.zcc.utils.redis;
 
+import com.zcc.utils.redis.constant.RedisKeyConstant;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.geo.Point;
+import org.springframework.data.redis.core.BoundGeoOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -568,5 +572,26 @@ public class RedisUtil {
 			e.printStackTrace();
 			return 0;
 		}
+	}
+	// ===============================bitmaps=================================
+//	/**
+//	 * 获取bitmaps缓存的内容
+//	 *
+//	 * @param key   键
+//	 * @param index 开始
+//	 * @return
+//	 */
+//	public List<Object> mGet(String key, long index) {
+//		try {
+//			return redisTemplate.opsForList()
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			return null;
+//		}
+//	}
+
+	public void addLatAndLng(Double lat, Double lng, String id) {
+		BoundGeoOperations<Serializable, Object> boundGeoOps = redisTemplate.boundGeoOps(RedisKeyConstant.USER_GEO_KEY.getKey());
+		boundGeoOps.geoAdd(new Point(lng, lat), id);
 	}
 }

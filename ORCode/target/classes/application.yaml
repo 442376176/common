@@ -2,7 +2,7 @@ server:
   port: 8080
 bee:
   db:
-    driverName : com.mysql.jdbc.Driver
+    driverName: com.mysql.jdbc.Driver
     url: jdbc:mysql://47.94.231.7:3307/test?characterEncoding=UTF-8
     username: root
     password: 123456
@@ -20,3 +20,23 @@ spring:
     timeBetweenEvictionRunsMillis: 60000
     maxWait: 60000
     maxActive: 10000
+  redis:
+    # 服務器地址
+    host: 127.0.0.1
+    # 服務器連接端口
+    port: 6379
+    # Redis數據庫索引
+    database: 0
+    # 連接超時時間(毫秒)
+    timeout: 1800000
+    # 連接池配置
+    lettuce:
+      pool:
+        # 連接池最大連接數（使用負值表示沒有限制）
+        max-active: 20
+        # 最大阻塞等待時間(負數表示沒有限制)
+        max-wait: -1
+        # 連接池中的最大空閒連接
+        max-idle: 5
+        # 最小空閒連接
+        min-idle: 0

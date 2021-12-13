@@ -13,7 +13,7 @@ import javax.persistence.Table;
 @NoArgsConstructor
 public class User {
     @AnnotationExport(columnName = "id")
-    private int id;
+    private Integer id;
     @AnnotationExport(columnName = "姓名")
     private String name;
     private String sex;
