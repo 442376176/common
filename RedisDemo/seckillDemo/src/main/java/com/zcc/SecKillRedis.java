@@ -12,7 +12,7 @@ import java.io.IOException;
  */
 public class SecKillRedis {
     public static void main(String[] args) {
-        Jedis jedis = new Jedis("47.94.231.7",6379);
+        Jedis jedis = new Jedis("127.0.0.1",6379);
         jedis.auth("123456");
         System.out.println(jedis.ping());
         jedis.close();

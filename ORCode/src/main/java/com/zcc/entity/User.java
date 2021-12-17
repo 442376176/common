@@ -17,5 +17,6 @@ public class User {
     @AnnotationExport(columnName = "姓名")
     private String name;
     private String sex;
+    private String phone;
 
 }

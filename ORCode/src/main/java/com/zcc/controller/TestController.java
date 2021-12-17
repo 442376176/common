@@ -2,6 +2,8 @@ package com.zcc.controller;
 
 import com.zcc.entity.User;
 import com.zcc.utils.excelExport.v1.POIExcelExportUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,6 +22,16 @@ import java.util.List;
 @RestController
 @RequestMapping("/test")
 public class TestController {
+
+    @Autowired
+    RedisTemplate redisTemplate;
+
+
+    @GetMapping("/redis")
+    public String testRedis(){
+        redisTemplate.opsForValue().set("test","ok");
+        return redisTemplate.opsForValue().get("test").toString();
+    }
 
     @GetMapping("/123")
     public void export(HttpServletRequest request, HttpServletResponse response) throws Exception{

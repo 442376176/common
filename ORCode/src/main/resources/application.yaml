@@ -3,14 +3,14 @@ server:
 bee:
   db:
     driverName: com.mysql.jdbc.Driver
-    url: jdbc:mysql://47.94.231.7:3307/test?characterEncoding=UTF-8
+    url: jdbc:mysql://127.0.0.1:3306/test?characterEncoding:UTF-8
     username: root
     password: 123456
 spring:
   datasource:
     logSlowSql: true
     driverClassName: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://47.94.231.7:3307/test?characterEncoding=utf-8&serverTimezone=GMT%2B8&useTimezone=true&allowMultiQueries=true
+    url: jdbc:mysql://127.0.0.1:3306/test?characterEncoding:utf-8&serverTimezone:GMT%2B8&useTimezone:true&allowMultiQueries:true&useSSL:true
     type: com.alibaba.druid.pool.DruidDataSource
     username: root
     password: 123456
@@ -25,7 +25,7 @@ spring:
     host: 127.0.0.1
     # 服務器連接端口
     port: 6379
-    # Redis數據庫索引
+    # Redis數據庫索引（默认为0）
     database: 0
     # 連接超時時間(毫秒)
     timeout: 1800000

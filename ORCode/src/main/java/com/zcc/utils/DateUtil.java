@@ -4,6 +4,8 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 public class DateUtil {
 
@@ -11,21 +13,182 @@ public class DateUtil {
     public static final int FIRST_DAY_OF_WEEK = Calendar.MONDAY;
 
 
-    public static void main(String args[]) throws ParseException {
-        String str_begin = "2018-01-15";
-        String str_end = "2021-09-22";
-        getMonths(str_begin, str_end);
-//        for (String s : map.keySet()){
-//            System.out.println(s);
-////            Date date = parseDate(s, YYYYMMDD);
-////            Date[] seasonDate = getSeasonDate(date);
-////            int season = getSeason(date);
-//        }
+    static class PeriodDto {
+        private Date from;
+        private Date to;
 
+        public Date getFrom() {
+            return from;
+        }
 
-        //getMonths(str_begin, str_end) ;
-        //getYears(str_begin, str_end) ;
+        public void setFrom(Date from) {
+            this.from = from;
+        }
+
+        public Date getTo() {
+            return to;
+        }
+
+        public void setTo(Date to) {
+            this.to = to;
+        }
     }
+
+    //    public static List<PeriodDto> mergePeriod(List<PeriodDto> periodList) {
+//        List<PeriodDto> result = new ArrayList<PeriodDto>();
+//
+//        if (periodList == null || periodList.size() < 1) {
+//            return result;
+//        }
+//
+//        // 对区间进行排序
+//        Collections.sort(periodList, new Comparator<PeriodDto>() {
+//            @Override
+//            public int compare(PeriodDto o1, PeriodDto o2) {
+//                if ((o1.getFrom().getTime() - o2.getFrom().getTime()) > 0) {
+//                    return 1;
+//                } else if ((o1.getFrom().getTime() - o2.getFrom().getTime()) == 0) {
+//                    return 0;
+//                } else {
+//                    return -1;
+//                }
+//            }
+//        });
+//        PeriodDto prev = null;
+//        for (PeriodDto item : periodList) {
+//            if (prev == null || prev.getTo().before(item.getFrom())) {
+//                result.add(item);
+//                prev = item;
+//            } else if (prev.getTo().before(item.getTo())) {
+//                prev.setTo(item.getTo());
+//            }
+//        }
+//
+//        return result;
+//    }
+    public static <T> Map<String, Integer> mergePeriod(List<T> periodList, Function<T, Date> start, Function<T, Date> end, BiConsumer<T, Date> consumer) {
+        Map<String, Integer> map = new HashMap<>();
+        List<T> result = new ArrayList<>();
+
+        if (periodList == null || periodList.size() < 1) {
+            return null;
+        }
+
+        // 对区间进行排序
+        Collections.sort(periodList, new Comparator<T>() {
+            @Override
+            public int compare(T o1, T o2) {
+                if ((start.apply(o1).getTime() - start.apply(o2).getTime()) > 0) {
+                    return 1;
+                } else if ((start.apply(o1).getTime() - start.apply(o2).getTime()) == 0) {
+                    return 0;
+                } else {
+                    return -1;
+                }
+            }
+        });
+        T prev = null;
+        for (T item : periodList) {
+            if (prev == null || end.apply(prev).before(start.apply(item))) {
+                result.add(item);
+                prev = item;
+            } else if (end.apply(prev).before(end.apply(item))) {
+                consumer.accept(prev, end.apply(prev));
+            }
+        }
+        result.forEach(item -> {
+            Date startTime = start.apply(item);
+            Date endTime = end.apply(item);
+            int startMonth = getMonth(startTime);
+            int endMonth = getMonth(endTime);
+            int startYear = getYear(startTime);
+            int endYear = getYear(endTime);
+            if (startYear == endYear && startMonth == endMonth) { // 同月
+                int day = diffDay(startTime, endTime);
+                map.put(formatDate(startTime, "yyyy-MM"), day);
+            } else { // 不同月
+                Map<String, Integer> months = getMonths(startTime, endTime);
+                int remainDayOfMonth = getRemainDayOfMonth(startTime) + 1;
+                int passDayOfMonth = getPassDayOfMonth(endTime);
+                Iterator<Map.Entry<String, Integer>> iterator = months.entrySet().iterator();
+                int i = 0;
+                while (iterator.hasNext()) {
+                    Map.Entry<String, Integer> next = iterator.next();
+                    if (i == 0) {
+                        map.put(next.getKey(), remainDayOfMonth);
+                        i++;
+                        continue;
+                    }
+                    if (!iterator.hasNext()) {
+                        map.put(next.getKey(), passDayOfMonth);
+                        continue;
+                    }
+                    map.put(next.getKey(), next.getValue());
+                }
+            }
+        });
+        return map;
+    }
+
+    /**
+     * 天数差
+     *
+     * @param
+     * @param
+     * @return
+     */
+    public static int diffDay(Date before, Date after) {
+        return Integer.parseInt(String.valueOf(((after.getTime() - before.getTime()) / 86400000)));
+    }
+
+    public static void main(String[] args) throws ParseException {
+//        System.out.println(getPassDayOfMonth(parseDate("2021-12-16")));
+
+        PeriodDto date1 = new PeriodDto();
+        date1.setFrom(DateUtil.parseDate("2020-01-01"));
+        date1.setTo(DateUtil.parseDate("2020-05-01"));
+
+        PeriodDto date2 = new PeriodDto();
+        date2.setFrom(DateUtil.parseDate("2021-05-01"));
+        date2.setTo(DateUtil.parseDate("2021-07-29"));
+
+        PeriodDto date3 = new PeriodDto();
+        date3.setFrom(DateUtil.parseDate("2018-01-01"));
+        date3.setTo(DateUtil.parseDate("2019-01-01"));
+
+        PeriodDto date4 = new PeriodDto();
+        date4.setFrom(DateUtil.parseDate("2020-04-01 12:00:00"));
+        date4.setTo(DateUtil.parseDate("2021-01-01 12:00:00"));
+
+        List<PeriodDto> list = new ArrayList<PeriodDto>();
+        list.add(date1);
+        list.add(date2);
+        list.add(date3);
+        list.add(date4);
+
+//        List<PeriodDto> result = mergePeriod(list);
+        Map<String, Integer> stringIntegerMap = mergePeriod(list, PeriodDto::getFrom, PeriodDto::getTo, PeriodDto::setTo);
+        System.out.println(stringIntegerMap.size());
+        System.out.println(stringIntegerMap);
+//        System.out.println(JSONObject.toJSONStringWithDateFormat(result, JSONObject.DEFFAULT_DATE_FORMAT));
+    }
+
+//    public static void main(String args[]) throws ParseException {
+//        String str_begin = "2021-01-15";
+//        String str_end = "2022-2-15";
+//        System.out.println(getMonths(parseDate(str_begin), parseDate(str_end)));
+////        System.out.println(getMonths(str_begin,str_end));
+////        for (String s : map.keySet()){
+////            System.out.println(s);
+//////            Date date = parseDate(s, YYYYMMDD);
+//////            Date[] seasonDate = getSeasonDate(date);
+//////            int season = getSeason(date);
+////        }
+//
+//
+//        //getMonths(str_begin, str_end) ;
+//        //getYears(str_begin, str_end) ;
+//    }
 
     /**
      * 获取年份
@@ -54,8 +217,8 @@ public class DateUtil {
             List<String> years = new LinkedList<>();
             if (cal_begin.get(Calendar.YEAR) == cal_end.get(Calendar.YEAR)) {
 //                System.out.println(sdf.format(cal_begin.getTime()) + "~" + sdf.format(cal_end.getTime()));
-                years.add(cal_begin.get(Calendar.YEAR)+"01"+"01");
-                years.add(cal_begin.get(Calendar.YEAR)+"12"+"31");
+                years.add(cal_begin.get(Calendar.YEAR) + "01" + "01");
+                years.add(cal_begin.get(Calendar.YEAR) + "12" + "31");
                 map.put(getYear(cal_begin.getTime()) + "", years);
                 break;
             } else {
@@ -171,9 +334,9 @@ public class DateUtil {
             List<String> months = new LinkedList<>();
             if (cal_begin.get(Calendar.YEAR) == cal_end.get(Calendar.YEAR) && cal_begin.get(Calendar.MONTH) == cal_end.get(Calendar.MONTH)) {
                 System.out.println(sdf.format(cal_begin.getTime()) + "~" + sdf.format(cal_end.getTime()));
-                months.add(cal_begin.get(Calendar.YEAR)+cal_begin.get(Calendar.MONTH)+"01");
-                months.add(cal_begin.get(Calendar.YEAR)+cal_begin.get(Calendar.MONTH)+"31");
-                map.put(getYear(cal_begin.getTime()) +"-"+ getMonth(cal_begin.getTime()), months);
+                months.add(cal_begin.get(Calendar.YEAR) + cal_begin.get(Calendar.MONTH) + "01");
+                months.add(cal_begin.get(Calendar.YEAR) + cal_begin.get(Calendar.MONTH) + "31");
+                map.put(getYear(cal_begin.getTime()) + "-" + getMonth(cal_begin.getTime()), months);
                 break;
             }
             String str_begin = sdf.format(cal_begin.getTime());
@@ -277,7 +440,7 @@ public class DateUtil {
             SimpleDateFormat format = new SimpleDateFormat(pattern);
             date = format.parse(strDate);
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
         return date;
     }
@@ -392,7 +555,7 @@ public class DateUtil {
     }
 
     /**
-     * 取得日期：年
+     * 取得日期：月
      *
      * @param date
      * @return
@@ -405,7 +568,7 @@ public class DateUtil {
     }
 
     /**
-     * 取得日期：年
+     * 取得日期：日
      *
      * @param date
      * @return
@@ -705,6 +868,40 @@ public class DateUtil {
                 break;
         }
         return season;
+    }
+
+    /**
+     * 获取时间段内的月
+     *
+     * @param begin
+     * @param end
+     */
+    public static Map<String, Integer> getMonths(Date begin, Date end) {
+
+        Map<String, Integer> map = new LinkedHashMap<>();
+        SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd");
+        Calendar cal_begin = Calendar.getInstance();
+        cal_begin.setTime(begin);
+        Calendar cal_end = Calendar.getInstance();
+        cal_end.setTime(end);
+        while (true) {
+
+            if (cal_begin.get(Calendar.YEAR) == cal_end.get(Calendar.YEAR) && cal_begin.get(Calendar.MONTH) == cal_end.get(Calendar.MONTH)) {
+                int i = cal_begin.get(Calendar.MONTH) + 1;
+                String strMonth = i<10?"0"+i:i+"";
+                String s = cal_begin.get(Calendar.YEAR) + "-" + strMonth + "-01";
+                Date date = parseDate(s);
+                map.put(getYear(cal_begin.getTime()) + "-" + getMonth(cal_begin.getTime()), getDayOfMonth(date));
+                break;
+            }
+            String str_begin = sdf.format(cal_begin.getTime());
+            int month = getMonth(cal_begin.getTime());
+            String strMonth = month<10?"0"+month:month+"";
+            map.put(getYear(cal_begin.getTime()) + "-" + strMonth, getDayOfMonth(parseDate(str_begin, "yyyy-MM-dd")));
+            cal_begin.add(Calendar.MONTH, 1);
+            cal_begin.set(Calendar.DAY_OF_MONTH, 1);
+        }
+        return map;
     }
 
 }
