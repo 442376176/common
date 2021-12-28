@@ -1,5 +1,6 @@
 package com.zcc.utils;
 
+import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -165,6 +166,9 @@ public class DateUtil {
         list.add(date2);
         list.add(date3);
         list.add(date4);
+
+        BigDecimal bigDecimal = new BigDecimal(1);
+
 
 //        List<PeriodDto> result = mergePeriod(list);
         Map<String, Integer> stringIntegerMap = mergePeriod(list, PeriodDto::getFrom, PeriodDto::getTo, PeriodDto::setTo);
@@ -888,7 +892,7 @@ public class DateUtil {
 
             if (cal_begin.get(Calendar.YEAR) == cal_end.get(Calendar.YEAR) && cal_begin.get(Calendar.MONTH) == cal_end.get(Calendar.MONTH)) {
                 int i = cal_begin.get(Calendar.MONTH) + 1;
-                String strMonth = i<10?"0"+i:i+"";
+                String strMonth = i < 10 ? "0" + i : i + "";
                 String s = cal_begin.get(Calendar.YEAR) + "-" + strMonth + "-01";
                 Date date = parseDate(s);
                 map.put(getYear(cal_begin.getTime()) + "-" + getMonth(cal_begin.getTime()), getDayOfMonth(date));
@@ -896,11 +900,33 @@ public class DateUtil {
             }
             String str_begin = sdf.format(cal_begin.getTime());
             int month = getMonth(cal_begin.getTime());
-            String strMonth = month<10?"0"+month:month+"";
+            String strMonth = month < 10 ? "0" + month : month + "";
             map.put(getYear(cal_begin.getTime()) + "-" + strMonth, getDayOfMonth(parseDate(str_begin, "yyyy-MM-dd")));
             cal_begin.add(Calendar.MONTH, 1);
             cal_begin.set(Calendar.DAY_OF_MONTH, 1);
         }
+        return map;
+    }
+
+    /**
+     * 时间段拆分
+     *
+     * @param discount  折扣天数
+     * @param startDate
+     * @param endDate
+     * @return 0 占满  其他为天数
+     */
+    private Map<String, Object> getDateList(Map<String, Integer> discount, Date startDate, Date endDate) {
+        Map<String, Object> map = new HashMap<>();
+        // 拆天数
+        Map<String, Integer> months = getMonths(startDate, endDate);
+        months.forEach((k, v) -> {
+            if (discount.containsKey(k)) {
+                v -= discount.get(k);
+            } else {
+                v = 0;
+            }
+        });
         return map;
     }
 

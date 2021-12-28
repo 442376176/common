@@ -1,7 +1,5 @@
 package com.zcc.controller;
 
-import com.zcc.entity.User;
-import com.zcc.utils.excelExport.v1.POIExcelExportUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,14 +8,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * @author zcc
  * @version 1.0
- * @date 2021/8/26 10:25
  */
 @RestController
 @RequestMapping("/test")
@@ -47,21 +41,21 @@ public class TestController {
 //            ServletOutputStream outputStream = response.getOutputStream();
 //        } catch (IOException e){
 //            e.printStackTrace();
+////        }
+//        class ExportTest extends POIExcelExportUtils<User>{
 //        }
-        class ExportTest extends POIExcelExportUtils<User>{
-        }
-        List<String> column = new LinkedList<>();
-        column.add("id");
-        column.add("姓名");
-        List<User> userList = new ArrayList<>();
-        for (int i = 0; i <4 ; i++) {
-            User user = new User();
-            user.setId(i);
-            user.setName(i+"cs");
-            user.setSex(i%2==0?"男":"女");
-            userList.add(user);
-        }
-        ExportTest exportTest = new ExportTest();
+//        List<String> column = new LinkedList<>();
+//        column.add("id");
+//        column.add("姓名");
+//        List<User> userList = new ArrayList<>();
+//        for (int i = 0; i <4 ; i++) {
+//            User user = new User();
+//            user.setId(i);
+//            user.setName(i+"cs");
+//            user.setSex(i%2==0?"男":"女");
+//            userList.add(user);
+//        }
+//        ExportTest exportTest = new ExportTest();
 //        exportTest.exportData(request,column,userList,"用户列表","用户表",response);
     }
 }

@@ -1,4 +1,4 @@
-package com.zcc;
+package com.zcc.test;
 
 import java.util.LinkedList;
 import java.util.List;

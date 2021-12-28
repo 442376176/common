@@ -1,4 +1,4 @@
-package com.zcc;
+package com.zcc.test;
 
 import com.alibaba.fastjson.JSONObject;
 import lombok.Data;

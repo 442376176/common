@@ -1,7 +1,6 @@
 package com.zcc.entity;
 
 import com.zcc.utils.AnnotationExport;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -9,7 +8,6 @@ import javax.persistence.Table;
 
 @Data
 @Table(name = "t_user")
-@AllArgsConstructor
 @NoArgsConstructor
 public class User {
     @AnnotationExport(columnName = "id")
@@ -19,4 +17,8 @@ public class User {
     private String sex;
     private String phone;
 
+    public User(Integer id, String name) {
+        this.id = id;
+        this.name = name;
+    }
 }
