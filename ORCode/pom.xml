@@ -3,9 +3,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <packaging>pom</packaging>
-    <modules>
-        <module>kafak-Demo</module>
-    </modules>
+
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
@@ -23,11 +21,11 @@
     <dependencies>
 
 <!--        规则引擎 QLExpress-->
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>QLExpress</artifactId>
-            <version>3.2.0</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.alibaba</groupId>-->
+<!--            <artifactId>QLExpress</artifactId>-->
+<!--            <version>3.2.0</version>-->
+<!--        </dependency>-->
         <!--        规则引擎 drools-->
 <!--        <dependency>-->
 <!--            <groupId>org.drools</groupId>-->
@@ -63,6 +61,10 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jdbc</artifactId>
         </dependency>
         <!--        redis-->
         <dependency>
@@ -107,22 +109,22 @@
             <scope>test</scope>
         </dependency>
         <!--        bee小蜜蜂orm-->
-        <dependency>
-            <groupId>org.teasoft</groupId>
-            <artifactId>bee</artifactId>
-            <version>1.9.5</version>
-        </dependency>
-        <dependency>
-            <groupId>org.teasoft</groupId>
-            <artifactId>honey</artifactId>
-            <version>1.9.5</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.teasoft</groupId>-->
+<!--            <artifactId>bee</artifactId>-->
+<!--            <version>1.9.5</version>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>org.teasoft</groupId>-->
+<!--            <artifactId>honey</artifactId>-->
+<!--            <version>1.9.5</version>-->
+<!--        </dependency>-->
         <!--for log framework,Excel(poi) -->
-        <dependency>
-            <groupId>org.teasoft</groupId>
-            <artifactId>bee-ext</artifactId>
-            <version>1.9.5</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.teasoft</groupId>-->
+<!--            <artifactId>bee-ext</artifactId>-->
+<!--            <version>1.9.5</version>-->
+<!--        </dependency>-->
         <!--        二维码工具-->
         <dependency>
             <groupId>com.google.zxing</groupId>
@@ -140,27 +142,23 @@
             <artifactId>cglib</artifactId>
             <version>2.2.2</version>
         </dependency>
-        <dependency>
-            <groupId>com.github.spt-oss</groupId>
-            <artifactId>mysql-connector-java-plus</artifactId>
-            <version>0.1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.teasoft</groupId>
-            <artifactId>bee</artifactId>
-            <version>1.9.5</version>
-        </dependency>
-        <dependency>
-            <groupId>org.teasoft</groupId>
-            <artifactId>honey</artifactId>
-            <version>1.9.5</version>
-        </dependency>
+
+<!--        <dependency>-->
+<!--            <groupId>org.teasoft</groupId>-->
+<!--            <artifactId>bee</artifactId>-->
+<!--            <version>1.9.5</version>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>org.teasoft</groupId>-->
+<!--            <artifactId>honey</artifactId>-->
+<!--            <version>1.9.5</version>-->
+<!--        </dependency>-->
         <!--for log framework,Excel(poi) -->
-        <dependency>
-            <groupId>org.teasoft</groupId>
-            <artifactId>bee-ext</artifactId>
-            <version>1.9.5</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.teasoft</groupId>-->
+<!--            <artifactId>bee-ext</artifactId>-->
+<!--            <version>1.9.5</version>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
@@ -170,17 +168,12 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <!--            <version>5.1.47</version>-->
-            <version>8.0.19</version>
-            <!-- 			<version>8.0.22</version> -->
-            <!--             <version>8.0.23</version> -->
-            <scope>runtime</scope>
         </dependency>
         <!--        數據源-->
         <dependency>
             <groupId>com.alibaba</groupId>
-            <artifactId>druid</artifactId>
-            <version>1.0.18</version>
+            <artifactId>druid-spring-boot-starter</artifactId>
+            <version>1.2.6</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -266,6 +259,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-test</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.dom4j</groupId>
+            <artifactId>dom4j</artifactId>
+            <version>2.1.3</version>
         </dependency>
     </dependencies>
     <repositories>

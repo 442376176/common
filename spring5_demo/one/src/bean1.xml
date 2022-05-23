@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd"
+>
+    <bean id="user" class="com.zcc.demo.bean.User"></bean>
+    <bean id="book" class="com.zcc.demo.bean.Book" p:name="测试P书籍" p:price="10.00P">
+<!--        <property name="name" value="测试书籍"/>-->
+<!--        <property name="price" value="10.00"/>-->
+    </bean>
+    <bean id="book1" class="com.zcc.demo.bean.Book" >
+        <property name="name">
+            <value><![CDATA[<<老人与海>>]]></value>
+        </property>
+        <property name="price">
+            <null/>
+        </property>
+    </bean>
+    <bean id="order" class="com.zcc.demo.bean.Order">
+        <constructor-arg index="0" value="测试名称"/>
+        <constructor-arg index="1" value="测试地址"/>
+<!--        <constructor-arg name="name" value="测试名称"/>-->
+<!--        <constructor-arg name="address" value="测试地址"/>-->
+    </bean>
+<!--service和dao对象创建-->
+    <bean name="userService" class="com.zcc.demo.service.UserService">
+<!--        注入UserDao对象
+            name:类中的属性名称
+            ref：创建userDao对象bean标签id值
+-->
+        <property name="userDao" ref="userDao"></property>
+    </bean>
+    <bean name="userDao" class="com.zcc.demo.dao.UserDaoImpl"></bean>
+
+</beans>

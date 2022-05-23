@@ -16,6 +16,7 @@ import java.util.function.Function;
 public class CommonTest {
 
 
+
     static class PeriodDto{
         private Date from;
         private Date to;

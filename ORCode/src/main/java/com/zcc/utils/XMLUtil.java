@@ -1,92 +1,80 @@
 package com.zcc.utils;
 
-import com.zcc.entity.Book;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import org.dom4j.Document;
+import org.dom4j.Element;
+import org.dom4j.io.SAXReader;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.StringReader;
-import java.io.StringWriter;
+import java.io.FileInputStream;
+import java.util.List;
 
-/**
- * @author zcc
- * @version 1.0
- * @date 2021/11/19 9:26
- */
 public class XMLUtil {
-    // 读取xml配置文件
-    public static String getMsgByTable(String name, String path, int index) throws Exception {
-        // 创建文档对象
-        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
-        Document document = documentBuilder.parse(new File(path));
+//    public static String getChartType(String name,String path,int index) {
+//        try {
+//            DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+//            DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+//            Document document;
+//            document = documentBuilder.parse(new File(path));
+//            short nodeType = document.getNodeType();
+//            String nodeValue = document.getNodeValue();
+//            NodeList nodeList = document.getElementsByTagName(name);
+//            Node classNode = nodeList.item(index).getFirstChild();
+//            String chartType = classNode.getNodeValue();
+//            return chartType;
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return null;
+//        }
+//    }
 
-        // 获取文本节点
-        NodeList nodeList1 = document.getChildNodes();
-        NodeList nodeList = document.getElementsByTagName(name);
-        Node item = nodeList.item(index);
-        String value = item.getNodeValue().trim();
-        return value;
-    }
 
-    /**
-     * 将对象直接转换成String类型的 XML输出
-     *
-     * @param obj
-     * @return
-     */
-    public static String convertToXml(Object obj) {
-        // 创建输出流
-        StringWriter sw = new StringWriter();
-        try {
-            // 利用jdk中自带的转换类实现
-            JAXBContext context = JAXBContext.newInstance(obj.getClass());
+    public static void main(String[] args)throws Exception {
 
-            Marshaller marshaller = context.createMarshaller();
-            // 格式化xml输出的格式
-            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
-                    Boolean.TRUE);
-            // 将对象转换成输出流形式的xml
-            marshaller.marshal(obj, sw);
-        } catch (JAXBException e) {
-            e.printStackTrace();
+        //创建dom4j解析器对象
+
+        SAXReader saxReader = new SAXReader();
+
+        //通过字节流加载硬盘中的xml文件到内存
+
+        Document xmlDocument = saxReader.read(new FileInputStream(new File("src\\main\\resources\\xml\\config.xml")));
+
+        //获取根节点
+
+        Element rootElement = xmlDocument.getRootElement();
+
+        //获取根节点写所有book字节点形成的集合
+
+        List<Element> list = rootElement.elements("book");
+
+        //迭代
+
+        for(Element element : list) {
+
+            //获取book节点的id属性值
+
+            String id = element.attributeValue("id");
+
+            //分别获取book节点的title/author/price子节点的内容
+
+            String title = element.element("title").getText().trim();
+
+            String author = element.element("author").getText().trim();
+
+            String price = element.element("price").getText().trim();
+
+
+
+            //将来我们可以将上述属性值封装到JavaBean对象中的所有属性中，
+
+            //加入到List<JavaBean>集合中
+
+            System.out.println(id+":"+title+" "+author+" "+price);
+
+            System.out.println("-------");
+
         }
-        return sw.toString();
-    }
 
-    /**
-     * 将String类型的xml转换成对象
-     */
-    public static Object convertXmlStrToObject(Class clazz, String xmlStr) {
-        Object xmlObject = null;
-        try {
-            JAXBContext context = JAXBContext.newInstance(clazz);
-            // 进行将Xml转成对象的核心接口
-            Unmarshaller unmarshaller = context.createUnmarshaller();
-            StringReader sr = new StringReader(xmlStr);
-            xmlObject = unmarshaller.unmarshal(sr);
-        } catch (JAXBException e) {
-            e.printStackTrace();
-        }
-        return xmlObject;
     }
 
 
-    public static void main(String[] args) throws Exception {
-
-        File file = new File("C:\\Users\\86151\\Desktop\\demo\\ORCode\\src\\main\\resources\\xml\\config.xml");
-        FileOutputStream stream = new FileOutputStream(file);
-        stream.write(convertToXml(Book.builder().id(1).author("zcc").bookcaseid(1).name("测试").pages(100).price(999.99F).publish("测试").orderid(1).build()).getBytes());
-        stream.flush();
-        stream.close();
-        System.out.println(getMsgByTable("book", "C:\\Users\\86151\\Desktop\\demo\\ORCode\\src\\main\\resources\\xml\\config.xml", 0));
-    }
 }

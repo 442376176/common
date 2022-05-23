@@ -1,0 +1,22 @@
+server:
+  port: 80
+
+spring:
+  application:
+    name: cloud-consumer-order
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/project?userUnicode=true&characterEncoding=utf-8&userSSL=false
+    username: root
+    password: 123456
+  #服务别名 注册zookeeper到注册中心
+  cloud:
+    zookeeper:
+      connect-string: 127.0.0.1:2181
+
+
+
+mybatis:
+  mapperLocations: classpath:mapper/*.xml #mapper.xml包路径
+  type-aliases-package: com.zcc.springcloud.entities #实体类包路径

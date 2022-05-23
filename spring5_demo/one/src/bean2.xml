@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd"
+>
+<!--内部bean写法-->
+    <bean id="emp" class="com.zcc.demo.bean.Employee" p:name="a" p:no="1">
+        <property name="dept">
+            <bean id="dept" class="com.zcc.demo.bean.Dept" p:name="安保"></bean>
+        </property>
+    </bean>
+<!--级联赋值写法 1-->
+    <bean id="emp1" class="com.zcc.demo.bean.Employee" p:name="b" p:no="2">
+        <property name="dept" ref="dept1"/>
+    </bean>
+    <bean id="dept1" class="com.zcc.demo.bean.Dept" p:name="财务"/>
+
+
+
+    <!--级联赋值写法 2-->
+    <bean id="emp2" class="com.zcc.demo.bean.Employee" p:name="b" p:no="2">
+        <property name="dept" ref="dept1"></property>
+        <property name="dept.name" value="开发"/>
+    </bean>
+</beans>

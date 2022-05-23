@@ -3,7 +3,7 @@ package com.zcc.utils.send.UPush;
 
 import com.alibaba.fastjson.JSON;
 import com.zcc.utils.MD5Utils;
-import com.zcc.utils.RestTemplateUtils;
+import com.zcc.utils.RPC.RestTemplateUtils;
 import com.zcc.utils.send.UPush.Android.AndroidPushJson;
 import com.zcc.utils.send.UPush.IOS.IOSPushJson;
 import org.springframework.http.HttpHeaders;

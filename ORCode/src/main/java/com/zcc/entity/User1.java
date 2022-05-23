@@ -12,5 +12,7 @@ public class User1 {
     private Integer id;
     private String name;
 
-
+    public void setId(Integer id) {
+        this.id = 5;
+    }
 }

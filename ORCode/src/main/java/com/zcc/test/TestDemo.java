@@ -2,6 +2,7 @@ package com.zcc.test;
 
 import com.zcc.entity.User;
 import com.zcc.entity.User1;
+import com.zcc.utils.CollectionUtils;
 import com.zcc.utils.PinYinUtil;
 import com.zcc.utils.idCardUtil.IDCardUtils;
 import lombok.Data;
@@ -9,6 +10,7 @@ import org.junit.Test;
 import org.springframework.beans.BeanUtils;
 
 import java.io.*;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,6 +19,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -39,12 +42,100 @@ public class TestDemo {
             new LinkedBlockingDeque<>());
 
 
+    private Function<String, String> isDouble = (s) -> {
+        double i = Double.valueOf(s);
+        int j = (int) i;
+        if (i - j > 0) {
+            return String.valueOf(i);
+        }
+        return String.valueOf(j);
+    };
+
+    @Test
+    public void g() {
+        System.out.println(isDouble.apply("1.000"));
+    }
+
+    @Test
+    public void f() {
+        long l = System.currentTimeMillis() / 1000;
+        long s = 1640099415;
+        System.out.println(l - s);
+        long l1 = (l - s) / 60;
+        long l2 = l1 / 60;
+        long l3 = l2 / 24;
+        System.out.println(l3);
+    }
+
+    @Test
+    public void e() {
+
+        List<Long> l1 = new ArrayList<>();
+        List<Long> l2 = new ArrayList<>();
+        l1.add(1L);
+        l1.add(2L);
+        l2.add(2L);
+        CollectionUtils.getUnion(l1, l2);
+        System.out.println(l1);
+
+    }
+
+    /**
+     * 字符串转换unicode
+     * @param string
+     * @return
+     */
+    /**
+     * 字符串转换unicode
+     */
+//中文转unicode编码
+    public static String gbEncoding(final String gbString) {
+        char[] utfBytes = gbString.toCharArray();
+        String unicodeBytes = "";
+        for (int i = 0; i < utfBytes.length; i++) {
+            String hexB = Integer.toHexString(utfBytes[i]);
+            if (hexB.length() <= 2) {
+                hexB = "00" + hexB;
+            }
+            unicodeBytes = unicodeBytes + "\\u" + hexB;
+        }
+        return unicodeBytes;
+    }
+
+
+    @Test
+    public void h() throws Exception {
+        String s = URLEncoder.encode("ss", "UTF-8");
+        String s1 = gbEncoding(s);
+        System.out.println(s1);
+    }
+
+    @Test
+    public void testXmlUtil() {
+//        try {
+//            String chartType = XMLUtil.getChartType("chartType", "src\\main\\resources\\xml\\config.xml", 0);
+//            System.out.println(chartType);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+    }
+
     @Test
     public void d() {
         User user = new User();
         User user1 = user;
         user1.setPhone("123");
-        System.out.println(user1);
+        user.setPhone("12");
+        List<User> users = new ArrayList<>();
+        users.add(user1);
+        users.add(user);
+        users.stream().map(item -> {
+            if (item.getPhone().equals("12")) {
+                item.setPhone("123");
+            }
+            return item;
+        }).collect(Collectors.toList());
+        System.out.println(user);
 
 
     }

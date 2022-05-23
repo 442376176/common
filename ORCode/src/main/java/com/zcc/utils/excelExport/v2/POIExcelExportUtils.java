@@ -4,11 +4,10 @@ package com.zcc.utils.excelExport.v2;
 import com.zcc.utils.excelExport.v1.GetAnnotationValue;
 import com.zcc.utils.sqlBuilder.StringUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.ss.util.CellRangeAddress;
-import org.apache.poi.xssf.usermodel.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -32,14 +31,14 @@ import java.util.Set;
 
 
 @Slf4j
-public abstract class POIExcelExportUtils<T> {
+public abstract class POIExcelExportUtils<T>{
 
     private Type type;
     private Class<T> clazz;
     private String[] fields;
     private String[] names;
 
-    public POIExcelExportUtils() {
+    public POIExcelExportUtils()  {
         // 获取泛型类型
         Type superClass = getClass().getGenericSuperclass();
         this.type = ((ParameterizedType) superClass).getActualTypeArguments()[0];
@@ -50,9 +49,9 @@ public abstract class POIExcelExportUtils<T> {
         }
         // 获取注解值
         Map<String, Map<String, String>> fieldAnnotationValue = null;
-        try {
+        try{
             fieldAnnotationValue = GetAnnotationValue.getFieldAnnotationValue(clazz, AnnotationExport.class);
-        } catch (Exception e) {
+        } catch (Exception e){
             log.error(e.getMessage());
         }
         Set<Map.Entry<String, Map<String, String>>> entries = fieldAnnotationValue.entrySet();
@@ -104,61 +103,59 @@ public abstract class POIExcelExportUtils<T> {
     public void exportData(HttpServletRequest request, List<T> data, String sheetName, String name, HttpServletResponse response, Map<String, String> map) throws Exception {
         try {
             //创建工作簿
-            XSSFWorkbook workBook = new XSSFWorkbook();
+            HSSFWorkbook workBook = new HSSFWorkbook();
             //创建工作表sheet
-            XSSFSheet sheet = workBook.createSheet(sheetName);
+            HSSFSheet sheet = workBook.createSheet(sheetName);
 
             /**
              * 第1行 标题
              */
-            XSSFRow row0 = sheet.createRow(0);
+            HSSFRow row0 = sheet.createRow(0);
 
 //            设置行高
 //            row0.setHeight((short) 300);
 //            获取单元格样式
-            XSSFCellStyle cellStyle0 = getXSSFCellStyle(workBook);
+            HSSFCellStyle cellStyle0 = getHSSFCellStyle(workBook);
 
             //创建标题单元格
-            XSSFCell cell0 = row0.createCell(0);
+            HSSFCell cell0 = row0.createCell(0);
             cell0.setCellStyle(cellStyle0);
             cell0.setCellValue(sheetName);
             //合并标题单元格，行和列都是从0开始计数，4个参数，分别为起始行，结束行，起始列，结束列
-            CellRangeAddress region0 = new CellRangeAddress(0, 0, 0, names.length - 1);
+            CellRangeAddress region0 = new CellRangeAddress(0, 0, 0, names.length-1);
             sheet.addMergedRegion(region0);
             // 第2行 表头
-            XSSFRow row = sheet.createRow(1);
+            HSSFRow row = sheet.createRow(1);
             for (int columnIndex = 0; columnIndex < names.length; columnIndex++) {
-                XSSFCell cell = row.createCell(columnIndex);
-                XSSFCellStyle cellStyle = getXSSFCellStyle(workBook);
+                HSSFCell cell = row.createCell(columnIndex);
+                HSSFCellStyle cellStyle = getHSSFCellStyle(workBook);
                 cell.setCellStyle(cellStyle);
                 cell.setCellValue(names[columnIndex]);
                 sheet.setColumnWidth(columnIndex, 5000);
             }
             int i = 1;
-            if (CollectionUtils.isNotEmpty(data)) {
-                for (T item : data) {
-                    XSSFRow xssfRow = sheet.createRow(i + 1);
-                    int j = 0;
-                    for (; j < fields.length; j++) {
-                        XSSFCell xssfCell = xssfRow.createCell(j);
-                        xssfCell.setCellStyle(cellStyle0);
-                        Method method = clazz.getMethod(fields[j]);
-                        Object obj = method.invoke(item);
-                        if (Objects.isNull(obj)) {
-                            obj = "";
-                        }
-                        xssfCell.setCellValue(obj.toString());
+            for (T item : data) {
+                HSSFRow xssfRow = sheet.createRow(i + 1);
+                int j = 0;
+                for (; j < fields.length; j++) {
+                    HSSFCell xssfCell = xssfRow.createCell(j);
+                    xssfCell.setCellStyle(cellStyle0);
+                    Method method = clazz.getMethod(fields[j]);
+                    Object obj = method.invoke(item);
+                    if (Objects.isNull(obj)){
+                        obj = "";
                     }
-                    if (map != null && map.size() > 0) {
-                        for (String s : map.keySet()) {
-                            XSSFCell xssfCell = xssfRow.createCell(j);
-                            xssfCell.setCellStyle(cellStyle0);
-                            xssfCell.setCellValue(map.get(s));
-                            j++;
-                        }
-                    }
-                    i++;
+                    xssfCell.setCellValue(obj.toString());
                 }
+                if (map != null && map.size() > 0) {
+                    for (String s : map.keySet()) {
+                        HSSFCell xssfCell = xssfRow.createCell(j);
+                        xssfCell.setCellStyle(cellStyle0);
+                        xssfCell.setCellValue(map.get(s));
+                        j++;
+                    }
+                }
+                i++;
             }
             downloadExcel(request, response, workBook, name);
         } catch (Exception e) {
@@ -175,7 +172,7 @@ public abstract class POIExcelExportUtils<T> {
      * @return
      * @throws IOException
      */
-    private static String downloadExcel(HttpServletRequest request, HttpServletResponse response, XSSFWorkbook workbook, String fileName) throws IOException {
+    private static String downloadExcel(HttpServletRequest request, HttpServletResponse response, HSSFWorkbook workbook, String fileName) throws IOException {
         // 设置响应和请求编码utf-8
         request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
@@ -215,8 +212,8 @@ public abstract class POIExcelExportUtils<T> {
     }
 
 
-    private XSSFCellStyle getXSSFCellStyle(XSSFWorkbook workBook) {
-        XSSFCellStyle cellStyle = workBook.createCellStyle();
+    private HSSFCellStyle getHSSFCellStyle(HSSFWorkbook workBook) {
+        HSSFCellStyle cellStyle = workBook.createCellStyle();
         //单元格内容垂直居中
         cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
         //单元格内容水平居中

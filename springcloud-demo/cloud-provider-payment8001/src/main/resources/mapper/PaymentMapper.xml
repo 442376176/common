@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zcc.springcloud.mapper.PaymentMapper">
+    <resultMap id="baseMap" type="com.zcc.springcloud.entities.Payment">
+        <id column="payId" property="payId" javaType="long" jdbcType="BIGINT"/>
+        <result column="serial" property="serial" javaType="string" jdbcType="VARCHAR"/>
+    </resultMap>
+    <sql id="baseFiled">
+
+                pay_id as payId,serial as serial
+
+    </sql>
+    <insert id="create" parameterType="com.zcc.springcloud.entities.Payment" useGeneratedKeys="true"
+            keyProperty="payId">
+
+                insert into payment(serial) values (#{serial});
+
+    </insert>
+
+    <select id="getAll" resultMap="baseMap">
+        select
+        <include refid="baseFiled"/>
+        from payment
+    </select>
+
+    <select id="getById" resultType="com.zcc.springcloud.entities.Payment">
+        select
+        <include refid="baseFiled"/>
+        from payment
+        where 1=1
+        <if test="id neq null">
+            and pay_id = #{id}
+        </if>
+    </select>
+</mapper>

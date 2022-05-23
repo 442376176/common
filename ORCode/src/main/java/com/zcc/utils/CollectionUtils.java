@@ -63,21 +63,30 @@ public class CollectionUtils<T> {
     /**
      * @param num  分的份数
      * @param list 需要分的集合
+     * @Author zcc
      */
-    public Map<String, List<String>> splitList(List<String> list, Integer num) {
-
-
+    public static <T> Map<String, List<T>> splitList(List<T> list, Integer num) {
+        HashMap<String, List<T>> stringListHashMap = new HashMap<String, List<T>>(); //用户封装返回的多个list
+        int key = num;
         int listSize = list.size(); //list 长度
+        int oneSize = listSize / key;
+        int surplus = listSize % key; // 放在最后一个
 
-        HashMap<String, List<String>> stringListHashMap = new HashMap<String, List<String>>(); //用户封装返回的多个list
-        List<String> stringlist = new ArrayList<String>();
-        ;         //用于承装每个等分list
+        List<T> stringlist = new ArrayList<>();
 
-        for (int i = 0; i < listSize; i++) {                        //for循环依次放入每个list中
+        //用于承装每个等分list
+        int i = 0;
+        for (; i < listSize; i++) {                        //for循环依次放入每个list中
             stringlist.add(list.get(i));                            //先将string对象放入list,以防止最后一个没有放入
-            if (((i + 1) % num == 0) || (i + 1 == listSize)) {               //如果l+1 除以 要分的份数 为整除,或者是最后一份,为结束循环.那就算作一份list,
-                stringListHashMap.put("stringList" + i, stringlist); //将这一份放入Map中.
-                stringlist = new ArrayList<String>();                //新建一个list,用于继续存储对象
+            if (((i + 1) % oneSize == 0) || (i + 1 == listSize)) {               //如果l+1 除以 要分的份数 为整除,或者是最后一份,为结束循环.那就算作一份list,
+                if (i+1>listSize-surplus-oneSize){
+                    i++;
+                    for (; i < listSize ; i++) {
+                        stringlist.add(list.get(i));
+                    }
+                }
+                stringListHashMap.put(--key + "", stringlist); //将这一份放入Map中.
+                stringlist = new ArrayList<T>();                //新建一个list,用于继续存储对象
             }
         }
         return stringListHashMap;                                     //将map返回
