@@ -8,7 +8,9 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.Serializable;
 import java.util.*;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.BinaryOperator;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -272,8 +274,8 @@ public class StreamTest {
         list.forEach(item -> sum[0] *= item);
         long s = sum[0] * (-300);
         System.out.println(s);
-        System.out.println(Stream.of(1, 2, 3).reduce(4, Integer::sum,Integer::sum));
-        System.out.println(Stream.of(1, 2, 3).parallel().reduce(4, Integer::sum,Integer::sum));
+        System.out.println(Stream.of(1, 2, 3).reduce(4, Integer::sum, Integer::sum));
+        System.out.println(Stream.of(1, 2, 3).parallel().reduce(4, Integer::sum, Integer::sum));
         int total1 = Thread.activeCount();
 
         /**
@@ -305,13 +307,527 @@ public class StreamTest {
         IntSummaryStatistics collect6 = Stream.of(1, 2, 3).collect(Collectors.summarizingInt(Integer::intValue));
         DoubleSummaryStatistics collect7 = Stream.of(1.0, 2.0, 3.0).collect(Collectors.summarizingDouble(Double::doubleValue));
         Long collect8 = Stream.of(1L, 2L, 3L).collect(Collectors.counting());
-        Map<String, Long> collect9 = Stream.of(11L, 2L, 3L,11L).collect(Collectors.toMap(Long::toHexString, Long::valueOf,(aw,b)->aw+b));
+        Map<String, Long> collect9 = Stream.of(11L, 2L, 3L, 11L).collect(Collectors.toMap(Long::toHexString, Long::valueOf, (aw, b) -> aw + b));
         Map<Integer, Map<Integer, List<Integer>>> collect10 = Stream.of(1, 2, 3).collect(Collectors.groupingBy(h -> h > 1 ? h : 0, Collectors.groupingBy(r -> r < 3 ? r : 10)));
 
         System.out.println(collect5);
 
+    }
 
+    // 测试收集器操作
+    @Test
+    public void collectorTest() {
+        List<Student> menu = Arrays.asList(
+                new Student("刘一", 721, true, Student.GradeType.THREE),
+                new Student("陈二", 637, true, Student.GradeType.THREE),
+                new Student("张三", 666, true, Student.GradeType.THREE),
+                new Student("李四", 531, true, Student.GradeType.TWO),
+                new Student("王五", 483, false, Student.GradeType.THREE),
+                new Student("赵六", 367, true, Student.GradeType.THREE),
+                new Student("孙七", 499, false, Student.GradeType.ONE));
+        /**
+         * 1.averagingDouble
+         * averagingDouble方法返回一个Collector收集器，它生成应用于输入元素的double值函数的算术平均值。如果没有元素，则结果为0。
+         * 返回的平均值可能会因记录值的顺序而变化，这是由于除了不同大小的值之外，还存在累积舍入误差。
+         * 通过增加绝对量排序的值(即总量，样本越大，结果越准确)往往会产生更准确的结果。如果任何记录的值是NaN或者总和在任何点NaN，那么平均值将是NaN。
+         * 注意： double格式可以表示-253到253范围内的所有连续整数。如果管道有超过253的值，则平均计算中的除数将在253处饱和，从而导致额外的数值误差。
+         */
+
+        /*序号	修饰符和类型	方法和描述
+        1	static <T> Collector<T,?,Double>	averagingDouble(ToDoubleFunction<? super T> mapper)Returns a Collector that produces the arithmetic mean of a double-valued function applied to the input elements.
+        2	static <T> Collector<T,?,Double>	averagingInt(ToIntFunction<? super T> mapper)Returns a Collector that produces the arithmetic mean of an integer-valued function applied to the input elements.
+        3	static <T> Collector<T,?,Double>	averagingLong(ToLongFunction<? super T> mapper)Returns a Collector that produces the arithmetic mean of a long-valued function applied to the input elements.
+        */
+
+        Double averagingDouble = menu.stream().collect(Collectors.averagingDouble(Student::getTotalScore));
+        Optional.ofNullable(averagingDouble).ifPresent(System.out::println);
+
+        // 557.7142857142857
+        /**
+         * 2.collectingAndThen
+         * collectingAndThen方法调整Collector收集器以执行其它的结束转换。例如，可以调整toList()收集器，以始终生成一个不可变的列表：
+         */
+        /*
+         序号	修饰符和类型	方法和描述
+           4	static <T,A,R,RR> Collector<T,A,RR>	collectingAndThen(Collector<T,A,R> downstream, Function<R,RR> finisher)Adapts a Collector to perform an additional finishing transformation.
+        */
+        // 可以调整toList()收集器，以始终生成一个不可变的列表：
+        List<Student> studentList = menu.stream().collect(
+                Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+        System.out.println(studentList);
+
+        //以指定字符串The Average totalScore is->输出所有学生的平均总成绩
+        // The Average totalScore is->557.7142857142857
+        Optional.ofNullable(menu.stream().collect(
+                Collectors.collectingAndThen(
+                        Collectors.averagingInt(Student::getTotalScore), a -> "The Average totalScore is->" + a)
+        )).ifPresent(System.out::println);
+        List<String> zcc = menu.stream().collect(
+                Collectors.collectingAndThen(Collectors.mapping(Student::getName, Collectors.toList()), a -> {
+                    List<String> strings = new ArrayList<>();
+                    a.forEach(item -> {
+                        StringBuilder builder = new StringBuilder(item);
+                        builder.append("zcc");
+                        strings.add(builder.toString());
+                    });
+                    return strings;
+                }));
+        System.out.println(zcc);
+
+        /**
+         * 3.counting
+         * counting方法返回一个Collector收集器接受T类型的元素，用于计算输入元素的数量。如果没有元素，则结果为0。
+         */
+        /*
+        static <T> Collector<T,?,Long>
+        counting()
+        Returns a Collector accepting elements of type T that counts the number of input elements.
+        */
+        // 统计所有学生人数
+        Optional.ofNullable(menu.stream().collect(Collectors.counting())).ifPresent(System.out::println);
+
+
+        /**
+         * 4.groupingBy
+         * 序号	修饰符和类型	方法和描述
+         * 6	static <T,K> Collector<T,?,Map<K,List<T>>>	groupingBy(Function<? super T,? extends K> classifier)Returns a Collector implementing a “group by” operation on input elements of type T, grouping elements according to a classification function, and returning the results in a Map.
+         * 7	static <T,K,A,D> Collector<T,?,Map<K,D>>	groupingBy(Function<? super T,? extends K> classifier, Collector<? super T,A,D> downstream)Returns a Collector implementing a cascaded “group by” operation on input elements of type T, grouping elements according to a classification function, and then performing a reduction operation on the values associated with a given key using the specified downstream Collector.
+         * 8	static <T,K,D,A,M extends Map<K,D>>Collector<T,?,M>	groupingBy(Function<? super T,? extends K> classifier, Supplier<M> mapFactory, Collector<? super T,A,D> downstream)Returns a Collector implementing a cascaded “group by” operation on input elements of type T, grouping elements according to a classification function, and then performing a reduction operation on the values associated with a given key using the specified downstream Collector.
+         *   M 代表Map类型
+         */
+
+        /**
+         * 4.1 groupingBy
+         * groupingBy(Function)方法返回一个Collector收集器对T类型的输入元素执行"group by"操作，
+         * 根据分类函数对元素进行分组，并将结果返回到Map。
+         * 分类函数将元素映射到某些键类型K。收集器生成一个Map<K, List<T>>，其键是将分类函数应用于输入元素得到的值，其对应值为List，其中包含映射到分类函数下关联键的输入元素。
+         * 无法保证返回的Map或List对象的类型，可变性，可序列化或线程安全性。
+         *
+         * 注意： 返回的Collector收集器不是并发的。对于并行流管道，combiner函数通过将键从一个映射合并到另一个映射来操作，这可能是一个昂贵的操作。
+         * 如果不需要保留元素出现在生成的Map收集器中的顺序，则使用groupingByConcurrent(Function)可以提供更好的并行性能。
+         *
+         */
+        // 统计各个年级的学生信息
+        // {TWO=[Student{name='李四', totalScore=531, local=true, gradeType=TWO}],
+        //THREE=[Student{name='刘一', totalScore=721, local=true, gradeType=THREE},
+        //Student{name='陈二', totalScore=637, local=true, gradeType=THREE},
+        //Student{name='张三', totalScore=666, local=true, gradeType=THREE},
+        //Student{name='王五', totalScore=483, local=false, gradeType=THREE},
+        //Student{name='赵六', totalScore=367, local=true, gradeType=THREE}],
+        //ONE=[Student{name='孙七', totalScore=499, local=false, gradeType=ONE}]}
+
+        Map<Student.GradeType, List<Student>> collect = menu.stream()
+                .collect(Collectors.groupingBy(Student::getGradeType));
+
+        Optional.ofNullable(collect).ifPresent(System.out::println);
+        /**
+         * 4.2groupingBy(Function, Collector)
+         * groupingBy(Function, Collector)方法返回一个Collector收集器，对T类型的输入元素执行级联"group by"操作，
+         * 根据分类函数对元素进行分组，然后使用指定的下游Collector收集器对与给定键关联的值执行缩减操作。
+         *
+         * 分类函数将元素映射到某些键类型K。下游收集器对T类型的元素进行操作，并生成D类型的结果。产生收集器生成Map<K, D>。
+         * 返回的Map的类型，可变性，可序列化或线程安全性无法保证。
+         *
+         * 注意： 返回的Collector收集器不是并发的。对于并行流管道，combiner函数通过将键从一个映射合并到另一个映射来操作，这可能是一个昂贵的操作。
+         * 如果不需要保留向下游收集器提供元素的顺序，则使用groupingByConcurrent(Function, Collector)可以提供更好的并行性能。
+         */
+
+        // 统计各年级学生人数
+        Optional.of(menu.stream()
+                .collect(Collectors.groupingBy(Student::getGradeType, Collectors.counting())))
+                .ifPresent(System.out::println);
+        /**
+         * 4.3groupingBy(Function, Supplier, Collector)
+         *groupingBy(Function, Supplier, Collector)方法返回一个Collector收集器，
+         * 对T类型的输入元素执行级联"group by"操作，根据分类函数对元素进行分组，
+         * 然后使用指定的下游Collector收集器对与给定键关联的值执行缩减操作。收集器生成的Map是使用提供的工厂函数创建的。
+         * 分类函数将元素映射到某些键类型K。下游收集器对T类型的元素进行操作，并生成D类型的结果。产生收集器生成Map<K, D>。
+         *
+         * 注意： 返回的Collector收集器不是并发的。对于并行流管道，
+         * combiner函数通过将键从一个映射合并到另一个映射来操作，这可能是一个昂贵的操作。
+         * 如果不需要保留向下游收集器提供元素的顺序，则使用groupingByConcurrent(Function, Supplier, Collector)可以提供更好的并行性能。
+         * */
+        // 统计各个年级的平均成绩，并有序输出
+        // class java.util.TreeMap
+        // {ONE=499.0, TWO=531.0, THREE=574.8}
+        Map<Student.GradeType, Double> map = menu.stream()
+                .collect(Collectors.groupingBy(
+                        Student::getGradeType,
+                        TreeMap::new,
+                        Collectors.averagingInt(Student::getTotalScore)));
+
+        Optional.of(map.getClass()).ifPresent(System.out::println);
+        Optional.of(map).ifPresent(System.out::println);
+
+    /**
+     * 6.joining
+     * 序号	修饰符和类型	方法和描述
+     * 12	static Collector<CharSequence,?,String>	joining()Returns a Collector that concatenates the input elements into a String, in encounter order.
+     * 13	static Collector<CharSequence,?,String>	joining(CharSequence delimiter)Returns a Collector that concatenates the input elements, separated by the specified delimiter, in encounter order.
+     * 14	static Collector<CharSequence,?,String>	joining(CharSequence delimiter, CharSequence prefix, CharSequence suffix)Returns a Collector that concatenates the input elements, separated by the specified delimiter, with the specified prefix and suffix, in encounter order.
+     */
+        /**
+         * 6.1joining()
+         * joining()方法返回一个Collector收集器，它按遇见顺序将输入元素连接成String。
+         */
+        // 将所有学生的姓名连接成字符串
+        System.out.println(menu.stream().map(Student::getName).collect(Collectors.joining()));
+        /**
+         * 6.2joining(delimiter)
+         * joining(delimiter)方法返回一个Collector收集器，它以遇见顺序连接由指定分隔符分隔的输入元素。
+         */
+        // 将所有学生的姓名用，连接成字符串
+        System.out.println(menu.stream().map(Student::getName).collect(Collectors.joining(",")));
+        /**
+         * 6.3joining(delimiter, prefix, suffix)
+         * joining(delimiter, prefix, suffix)方法返回一个Collector收集器，它以遇见顺序将由指定分隔符分隔的输入元素与指定的前缀和后缀连接起来。
+         */
+        System.out.println(menu.stream().map(Student::getName).collect(Collectors.joining(",","{","}")));
+
+     /**
+      * 7.mapping
+      *序号	修饰符和类型	方法和描述
+      * 15	static <T,U,A,R> Collector<T,?,R>	mapping(Function<? super T,? extends U> mapper, Collector<? super U,A,R> downstream)Adapts a Collector accepting elements of type U to one accepting elements of type T by applying a mapping function to each input element before accumulation.
+      * mapping方法通过在累积之前将映射函数应用于每个输入元素，将Collector收集器接受U类型的元素调整为一个接受T类型的元素。
+      */
+        // 将所有学生的姓名以","分隔连接成字符串
+        System.out.println(menu.stream().collect(Collectors.mapping(Student::getName,Collectors.joining(","))));
+        // 收集所有学生分数
+        System.out.println(menu.stream().collect(Collectors.mapping(Student::getTotalScore,Collectors.toList())));
+
+        /**
+         * 8.maxBy 9.minBy
+         * 序号	修饰符和类型	方法和描述
+         * 16	static <T> Collector<T,?,Optional<T>>	maxBy(Comparator<? super T> comparator)Returns a Collector that produces the maximal element according to a given Comparator, described as an Optional<T>.
+         *      maxBy方法返回一个Collector收集器，它根据给定的Comparator比较器生成最大元素，描述为Optional<T>。
+         * */
+        // 列出所有学生中成绩最高的学生信息
+        menu.stream().collect(Collectors.maxBy(Comparator.comparingInt(Student::getTotalScore)))
+                .ifPresent(System.out::println);
+        // 列出所有学生中成绩最低的学生信息
+        menu.stream().collect(Collectors.minBy(Comparator.comparingInt(Student::getTotalScore)))
+                .ifPresent(System.out::println);
+        /**
+         * 10.partitioningBy
+         *序号	修饰符和类型	方法和描述
+         * 18	static <T> Collector<T,?,Map<Boolean,List<T>>>	partitioningBy(Predicate<? super T> predicate)Returns a Collector which partitions the input elements according to a Predicate, and organizes them into a Map<Boolean, List<T>>.
+         * 19	static <T,D,A> Collector<T,?,Map<Boolean,D>>	partitioningBy(Predicate<? super T> predicate, Collector<? super T,A,D> downstream)Returns a Collector which partitions the input elements according to a Predicate, reduces the values in each partition according to another Collector, and organizes them into aMap<Boolean, D> whose values are the result of the downstream reduction.
+         * */
+
+            /**
+             * 10.1 partitioningBy(Predicate)
+             * partitioningBy(Predicate)方法返回一个Collector收集器，它根据Predicate对输入元素进行分区，
+             * 并将它们组织成Map<Boolean, List<T>>。
+             * */
+            Map<Boolean, List<Student>> booleanListMap = menu.stream()
+                    .collect(Collectors.partitioningBy(Student::isLocal));
+            Optional.of(booleanListMap).ifPresent(System.out::println);
+            /**
+             * 10.2 partitioningBy(Predicate, Collector)
+             *  partitioningBy(Predicate, Collector)方法返回一个Collector收集器，它根据Predicate对输入元素进行分区，
+             *  根据另一个Collector收集器减少每个分区中的值，并将它们组织成Map<Boolean, D>，其值是下游减少的结果。
+             *  返回的Map的类型，可变性，可序列化或线程安全性无法保证。
+             * */
+            Map<Boolean, Double> doubleMap = menu.stream()
+                    .collect(Collectors.partitioningBy(
+                            Student::isLocal,
+                            Collectors.averagingInt(Student::getTotalScore)));
+            Optional.of(doubleMap).ifPresent(System.out::println);
+/**
+ * 11.reducing
+ *0	static <T> Collector<T,?,Optional<T>>	reducing(BinaryOperator<T> op)Returns a Collector which performs a reduction of its input elements under a specified BinaryOperator.
+ * 21	static <T> Collector<T,?,T>	reducing(T identity, BinaryOperator<T> op)Returns a Collector which performs a reduction of its input elements under a specified BinaryOperator using the provided identity.
+ * 22	static <T,U> Collector<T,?,U>	reducing(U identity, Function<? super T,? extends U> mapper, BinaryOperator<U> op)Returns a Collector which performs a reduction of its input elements under a specified mapping function and BinaryOperator.
+ *
+ * */
+    /**
+     * 11.1 reducing(BinaryOperator)
+     * 返回一个Collector收集器 它在指定的BinaryOperator下执行器输入元素的缩减。结果被描述为Optional<T>
+     *  reducing()相关收集器在groupingBy/partitioningBy下游的多集缩减中使用非常有用。要对流执行简单缩减，请使用Stream#reduce（BinaryOperator）
+     * */
+    // 列出所有学生中成绩最高的学生信息
+        long a = System.currentTimeMillis();
+
+        menu.stream().collect(Collectors
+                .reducing(BinaryOperator
+                        .maxBy(Comparator
+                                .comparingInt(Student::getTotalScore))))
+                .ifPresent(System.out::println);
+
+        long b = System.currentTimeMillis();
+
+        menu.stream().reduce(BinaryOperator
+                .maxBy(Comparator
+                        .comparingInt(Student::getTotalScore)))
+                .ifPresent(System.out::println);
+        long c = System.currentTimeMillis();
+        System.out.println(b-a);
+        System.out.println(c-b);
+      /**
+       * 11.2reducing(Object, BinaryOperator)
+       * 返回一个Collector收集器，它使用提供的标识在指定的BinaryOperator下执行其输入元素的缩减。
+       * reducing()相关收集器在groupingBy或partitioningBy下游的多级缩减中使用时非常有用。要对流执行简单缩减，请使用Stream#reduce(Object, BinaryOperator)。
+       * */
+        long l = System.currentTimeMillis();
+        Integer result = menu.stream()
+                .map(Student::getTotalScore)
+                .collect(Collectors.reducing(1, (d1, d2) -> d1 + d2));
+        long q = System.currentTimeMillis();
+        System.out.println(result);
+        Integer result1 = menu.stream()
+                .map(Student::getTotalScore).reduce(0, (d1, d2) -> d1 + d2);
+        System.out.println(result1);
+     /**
+      * 11.3reducing(Object, Function, BinaryOperator)
+      * 返回一个Collector收集器，它在指定的映射函数和BinaryOperator下执行其输入元素的缩减。这是对reducing(Object, BinaryOperator)的概括，它允许在缩减之前转换元素。
+      *
+      * reducing()相关收集器在groupingBy或partitioningBy下游的多级缩减中使用时非常有用。要对流执行简单缩减，请使用Stream#map(Function)和Stream#reduce(Object, BinaryOperator)。
+      * */
+        long w = System.currentTimeMillis();
+        Integer result2 = menu.stream()
+                .collect(Collectors.reducing(0, Student::getTotalScore, (d1, d2) -> d1 + d2));
+        long e = System.currentTimeMillis();
+        System.out.println(q-l);
+        System.out.println(e-w);
+        System.out.println(result2);
+      /**
+       *
+       *12.summarizingDouble
+       * 23	static <T> Collector<T,?,DoubleSummaryStatistics>	summarizingDouble(ToDoubleFunction<? super T> mapper)Returns a Collector which applies an double-producing mapping function to each input element, and returns summary statistics for the resulting values.
+       * 24	static <T> Collector<T,?,IntSummaryStatistics>	summarizingInt(ToIntFunction<? super T> mapper)Returns a Collector which applies an int-producing mapping function to each input element, and returns summary statistics for the resulting values.
+       * 25	static <T> Collector<T,?,LongSummaryStatistics>	summarizingLong(ToLongFunction<? super T> mapper)Returns a Collector which applies an long-producing mapping function to each input element, and returns summary statistics for the resulting values.
+       * summarizingDouble方法返回一个Collector收集器，它将double生成映射函数应用于每个输入元素，并返回结果值的摘要统计信息。
+       *
+       * */
+      // 统计所有学生的摘要信息（总人数，总成绩，最高成绩，最低成绩和平均成绩）
+        DoubleSummaryStatistics res = menu.stream()
+                .collect(Collectors.summarizingDouble(Student::getTotalScore));
+        Optional.of(res).ifPresent(System.out::println);
+     /**
+      * 13.summingDouble
+      * 26	static <T> Collector<T,?,Double>	summingDouble(ToDoubleFunction<? super T> mapper)Returns a Collector that produces the sum of a double-valued function applied to the input elements.
+      * 27	static <T> Collector<T,?,Integer>	summingInt(ToIntFunction<? super T> mapper)Returns a Collector that produces the sum of a integer-valued function applied to the input elements.
+      * 28	static <T> Collector<T,?,Long>	summingLong(ToLongFunction<? super T> mapper)Returns a Collector that produces the sum of a long-valued function applied to the input elements.
+      *返回一个Collector收集器，它生成应用于输入元素的double值函数的总和。如果没有元素，则结果为0。
+      * 返回的总和可能会因记录值的顺序而变化，这是由于除了不同大小的值之外，还存在累积舍入误差。
+      * 通过增加绝对量排序的值(即总量，样本越大，结果越准确)往往会产生更准确的结果。
+      * 如果任何记录的值是NaN或者总和在任何点NaN，那么总和将是NaN。
+      * */
+        Optional.of(menu.stream().collect(Collectors.summingDouble(Student::getTotalScore)))
+                .ifPresent(System.out::println);
+   /**
+    * 14.toCollection
+    * 返回一个Collector收集器，它按遇见顺序将输入元素累积到一个新的Collection收集器中。Collection收集器由提供的工厂创建。
+    * */
+   Optional.of(menu.stream().filter(d -> d.getTotalScore() > 600)
+           .collect(Collectors.toCollection(LinkedList::new)))
+           .ifPresent(v -> {
+               System.out.println(v.getClass());
+               System.out.println(v);
+           });
+/**
+ * 15.toConcurrentMap
+ * 30	static <T,K,U> Collector<T,?,ConcurrentMap<K,U>>	toConcurrentMap(Function<? super T,? extends K> keyMapper, Function<? super T,? extends U> valueMapper)Returns a concurrent Collector that accumulates elements into a ConcurrentMap whose keys and values are the result of applying the provided mapping functions to the input elements.
+ * 31	static <T,K,U> Collector<T,?,ConcurrentMap<K,U>>	toConcurrentMap(Function<? super T,? extends K> keyMapper, Function<? super T,? extends U> valueMapper, BinaryOperator<U> mergeFunction)Returns a concurrent Collector that accumulates elements into a ConcurrentMap whose keys and values are the result of applying the provided mapping functions to the input elements.
+ * 32	static <T,K,U,M extends ConcurrentMap<K,U>>Collector<T,?,M>	toConcurrentMap(Function<? super T,? extends K> keyMapper, Function<? super T,? extends U> valueMapper, BinaryOperator<U> mergeFunction, Supplier<M> mapSupplier)Returns a concurrent Collector that accumulates elements into a ConcurrentMap whose keys and values are the result of applying the provided mapping functions to the input elements.
+ *
+ * */
+    /**
+     * 15.1toConcurrentMap(Function, Function)
+     * 返回一个并发的Collector收集器，它将元素累积到ConcurrentMap中，其键和值是将提供的映射函数应用于输入元素的结果。
+     *
+     * 如果映射的键包含重复项(根据Object#equals(Object))，则在执行收集操作时会抛出IllegalStateException。如果映射的键可能有重复，请使用toConcurrentMap(Function, Function, BinaryOperator)。
+     *
+     * 注意： 键或值作为输入元素是常见的。在这种情况下，实用方法java.util.function.Function#identity()可能会有所帮助。
+     *
+     * 这是一个Collector.Characteristics#CONCURRENT并发和Collector.Characteristics#UNORDERED无序收集器。
+     *
+     * */
+        Optional.of(menu.stream()
+                .collect(Collectors.toConcurrentMap(Student::getName,Student::getTotalScore)))
+                .ifPresent(v -> {
+                    System.out.println(v);
+                    System.out.println(v.getClass());
+                });
+        /**
+         * 15.2toConcurrentMap(Function, Function, BinaryOperator)
+         * 返回一个并发的Collector收集器，它将元素累积到ConcurrentMap中，其键和值是将提供的映射函数应用于输入元素的结果。
+         * */
+        Optional.of(menu.stream()
+                .collect(Collectors.toConcurrentMap(Student::getGradeType, Student::getName,(z,x)->z+","+x)))
+                .ifPresent(v -> {
+                    System.out.println(v);
+                    System.out.println(v.getClass());
+                });
+
+        /**
+         * 15.3toConcurrentMap(Function, Function, BinaryOperator, Supplier)
+         * 返回一个并发的Collector收集器，它将元素累积到ConcurrentMap中，其键和值是将提供的映射函数应用于输入元素的结果。
+         *
+         * 如果映射的键包含重复项(根据Object#equals(Object))，则将值映射函数应用于每个相等的元素，并使用提供的合并函数合并结果。ConcurrentMap由提供的供应商函数创建。
+         *
+         * 这是一个Collector.Characteristics#CONCURRENT并发和Collector.Characteristics#UNORDERED无序收集器。
+         * */
+        Optional.of(menu.stream()
+                .collect(Collectors.toConcurrentMap(
+                        Student::getGradeType,
+                        v -> 1L,
+                        (n, v) -> n + v,
+                        ConcurrentSkipListMap::new)))
+                .ifPresent(v -> {
+                    System.out.println(v);
+                    System.out.println(v.getClass());
+                });
+    /**
+     * 16.toList
+     * 33	static <T> Collector<T,?,List<T>>	toList()Returns a Collector that accumulates the input elements into a new List.
+     * 返回一个Collector收集器，它将输入元素累积到一个新的List中。返回的List的类型，可变性，可序列化或线程安全性无法保证;如果需要更多地控制返回的List，请使用toCollection(Supplier)。
+     *
+     * 示例：查出本地学生的信息并放入ArrayList中
+     * */
+
+        Optional.of(menu.stream().filter(Student::isLocal).collect(Collectors.toList()))
+                .ifPresent(r -> {
+                    System.out.println(r.getClass());
+                    System.out.println(r);
+                });
+      /**
+       * 17.toMap
+       * 34	static <T,K,U> Collector<T,?,Map<K,U>>	toMap(Function<? super T,? extends K> keyMapper, Function<? super T,? extends U> valueMapper)Returns a Collector that accumulates elements into a Map whose keys and values are the result of applying the provided mapping functions to the input elements.
+       * 35	static <T,K,U> Collector<T,?,Map<K,U>>	toMap(Function<? super T,? extends K> keyMapper, Function<? super T,? extends U> valueMapper, BinaryOperator<U> mergeFunction)Returns a Collector that accumulates elements into a Map whose keys and values are the result of applying the provided mapping functions to the input elements.
+       * 36	static <T,K,U,M extends Map<K,U>>Collector<T,?,M>	toMap(Function<? super T,? extends K> keyMapper, Function<? super T,? extends U> valueMapper, BinaryOperator<U> mergeFunction, Supplier<M> mapSupplier)Returns a Collector that accumulates elements into a Map whose keys and values are the result of applying the provided mapping functions to the input elements.
+       * */
+       /**
+        * 17.1toMap(Function, Function)
+        * 返回一个Collector收集器，它将元素累积到Map中，其键和值是将提供的映射函数应用于输入元素的结果。
+        *
+        * 如果映射的键包含重复项(根据Object#equals(Object))，则在执行收集操作时会抛出IllegalStateException。如果映射的键可能有重复，请使用toMap(Function, Function, BinaryOperator)。
+        *
+        * 注意： 键或值作为输入元素是常见的。在这种情况下，实用方法java.util.function.Function#identity()可能会有所帮助。
+        *
+        * 返回的Collector收集器不是并发的。对于并行流管道，combiner函数通过将键从一个映射合并到另一个映射来操作，这可能是一个昂贵的操作。
+        *
+        * 如果不需要将结果以遇见的顺序插入Map，则使用toConcurrentMap(Function, Function)可以提供更好的并行性能。
+        *
+        * 17.2toMap(Function, Function, BinaryOperator)
+        * 返回一个并发的Collector收集器，它将元素累积到Map中，其键和值是将提供的映射函数应用于输入元素的结果。
+        *
+        * 如果映射的键包含重复项(根据Object#equals(Object))，则将值映射函数应用于每个相等的元素，并使用提供的合并函数合并结果。
+        *
+        * 注意： 有多种方法可以处理映射到同一个键的多个元素之间的冲突。toMap的其它形式只是使用无条件抛出的合并函数，但你可以轻松编写更灵活的合并策略。例如，如果你有一个Person流，并且你希望生成一个“电话簿”映射名称到地址，但可能有两个人具有相同的名称，你可以按照以下方式进行优雅的处理这些冲突，并生成一个Map将名称映射到连接的地址列表中：
+        *
+        * Map<String, String> phoneBook
+        *  people.stream().collect(toConcurrentMap(Person::getName,
+        *                                          Person::getAddress,
+        *                                          (s, a) -> s + ", " + a));
+        * 1
+        * 2
+        * 3
+        * 4
+        * 返回的Collector收集器不是并发的。对于并行流管道，combiner函数通过将键从一个映射合并到另一个映射来操作，这可能是一个昂贵的操作。
+        *
+        * 如果不需要将结果以遇见的顺序插入Map，则使用toConcurrentMap(Function, Function, BinaryOperator)可以提供更好的并行性能。
+        *
+        * 17.3toMap(Function, Function, BinaryOperator, Supplier)
+        * 返回一个Collector收集器，它将元素累积到Map中，其键和值是将提供的映射函数应用于输入元素的结果。
+        *
+        * 如果映射的键包含重复项(根据Object#equals(Object))，则将值映射函数应用于每个相等的元素，并使用提供的合并函数合并结果。Map由提供的供应商函数创建。
+        *
+        * 注意： 返回的Collector收集器不是并发的。对于并行流管道，combiner函数通过将键从一个映射合并到另一个映射来操作，这可能是一个昂贵的操作。
+        *
+        * 如果不需要将结果以遇见的顺序插入Map，则使用toConcurrentMap(Function, Function, BinaryOperator, Supplier)可以提供更好的并行性能。
+        * */
+    /**
+     * 18.toSet
+     * 37	static <T> Collector<T,?,Set<T>>	toSet()Returns a Collector that accumulates the input elements into a new Set.
+     * 返回一个Collector收集器，它将输入元素累积到一个新的Set中。
+     * 返回的Set的类型，可变性，可序列化或线程安全性无法保证;如果需要更多地控制返回的Set，请使用toCollection(Supplier)。
+     * 这是一个Collector.Characteristics#UNORDERED无序收集器。
+     * */
+        Optional.of(menu.stream().filter(Student::isLocal).collect(Collectors.toSet()))
+                .ifPresent(r -> {
+                    System.out.println(r.getClass());
+                    System.out.println(r);
+                });
     }
 
 
+    /**
+     * 学生信息
+     */
+
+    static class Student {
+        /**
+         * 姓名
+         */
+        private String name;
+        /**
+         * 总分
+         */
+        private int totalScore;
+        /**
+         * 是否本地人
+         */
+        private boolean local;
+        /**
+         * 年级
+         */
+        private GradeType gradeType;
+
+        /**
+         * 年级类型
+         */
+        enum GradeType {ONE, TWO, THREE}
+
+        Student(String name, int totalScore, boolean local, GradeType gradeType) {
+            this.name = name;
+            this.totalScore = totalScore;
+            this.local = local;
+            this.gradeType = gradeType;
+        }
+
+        @Override
+        public String toString() {
+            return "Student{" +
+                    "name='" + name + '\'' +
+                    ", totalScore=" + totalScore +
+                    ", local=" + local +
+                    ", gradeType=" + gradeType +
+                    '}';
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public int getTotalScore() {
+            return totalScore;
+        }
+
+        public void setTotalScore(int totalScore) {
+            this.totalScore = totalScore;
+        }
+
+        public boolean isLocal() {
+            return local;
+        }
+
+        public void setLocal(boolean local) {
+            this.local = local;
+        }
+
+        public GradeType getGradeType() {
+            return gradeType;
+        }
+
+        public void setGradeType(GradeType gradeType) {
+            this.gradeType = gradeType;
+        }
+    }
 }
+
+

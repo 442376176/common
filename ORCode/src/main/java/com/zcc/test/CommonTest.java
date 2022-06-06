@@ -5,6 +5,7 @@ import com.zcc.utils.DateUtil;
 
 import java.text.ParseException;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
@@ -15,6 +16,32 @@ import java.util.function.Function;
  */
 public class CommonTest {
 
+
+    static class A{
+        public static void main(String[] args) {
+            String s = "1,2,3";
+            List<Integer> objects = new ArrayList<>();
+            objects.add(1);
+            objects.add(2);
+            objects.add(3);
+            long l = System.currentTimeMillis();
+            List<String> strings = Arrays.asList(s.split(","));
+            objects.forEach(item->{
+                CompletableFuture.supplyAsync(()->item)
+                        .thenApply(a-> add(a));
+            });
+            System.out.println(System.currentTimeMillis()-l);
+            long l1 = System.currentTimeMillis();
+            objects.forEach( A::add);
+            System.out.println(System.currentTimeMillis()-l1);
+        }
+
+
+        public static int add(int a){
+            System.out.println(a+1);
+            return a+1;
+        }
+    }
 
 
     static class PeriodDto{
