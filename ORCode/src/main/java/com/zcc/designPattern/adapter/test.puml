@@ -1,0 +1,32 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+
+interface Controller
+class HttpController
+class AnnotationController
+class SimpleController
+class DispatchServlet
+interface HandlerAdapter
+class HttpHandlerAdapter
+class AnnotationHandlerAdapter
+class SimpleHandlerAdapter
+
+
+
+Controller <|-- HttpController
+Controller <|-- AnnotationController
+Controller <|-- SimpleController
+Controller <|- DispatchServlet
+DispatchServlet <|- HandlerAdapter
+
+HandlerAdapter <|-- HttpHandlerAdapter
+HandlerAdapter <|-- AnnotationHandlerAdapter
+HandlerAdapter <|-- SimpleHandlerAdapter
+
+class DispatchServlet{
+    public void doDispatchServlet();
+}
+
+
+@enduml

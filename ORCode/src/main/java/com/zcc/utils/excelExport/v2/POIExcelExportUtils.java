@@ -1,10 +1,12 @@
 package com.zcc.utils.excelExport.v2;
 
-
-import com.zcc.utils.excelExport.v1.GetAnnotationValue;
+import com.zcc.utils.GetAnnotationValue;
 import com.zcc.utils.sqlBuilder.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.hssf.usermodel.*;
+import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.ss.usermodel.BorderStyle;
+import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.ss.util.CellRangeAddress;
@@ -27,18 +29,19 @@ import java.util.Set;
  * @author zcc
  * @version 1.0
  * @date 2021/8/31 13:58
+ * @Desc：支持自定义字段导出
  */
 
 
 @Slf4j
-public abstract class POIExcelExportUtils<T>{
+public abstract class POIExcelExportUtils<T> {
 
     private Type type;
     private Class<T> clazz;
     private String[] fields;
     private String[] names;
 
-    public POIExcelExportUtils()  {
+    public POIExcelExportUtils() {
         // 获取泛型类型
         Type superClass = getClass().getGenericSuperclass();
         this.type = ((ParameterizedType) superClass).getActualTypeArguments()[0];
@@ -49,9 +52,9 @@ public abstract class POIExcelExportUtils<T>{
         }
         // 获取注解值
         Map<String, Map<String, String>> fieldAnnotationValue = null;
-        try{
+        try {
             fieldAnnotationValue = GetAnnotationValue.getFieldAnnotationValue(clazz, AnnotationExport.class);
-        } catch (Exception e){
+        } catch (Exception e) {
             log.error(e.getMessage());
         }
         Set<Map.Entry<String, Map<String, String>>> entries = fieldAnnotationValue.entrySet();
@@ -64,6 +67,29 @@ public abstract class POIExcelExportUtils<T>{
                     names[i] = entry.getValue().get("columnName");
                 }
             }
+        }
+    }
+
+    /**
+     * 带有自定义字段的导出
+     *
+     * @param fieldList 自定义属性
+     * @param nameList  自定义名称
+     */
+    public POIExcelExportUtils(List<String> nameList, List<String> fieldList) {
+        // 获取泛型类型
+        Type superClass = getClass().getGenericSuperclass();
+        this.type = ((ParameterizedType) superClass).getActualTypeArguments()[0];
+        if (this.type instanceof ParameterizedType) {
+            this.clazz = (Class<T>) ((ParameterizedType) this.type).getRawType();
+        } else {
+            this.clazz = (Class<T>) this.type;
+        }
+        fields = new String[fieldList.size()];
+        names = new String[nameList.size()];
+        for (int i = 0; i < fields.length; i++) {
+            fields[i] = "get" + StringUtils.convertToCamelCase(fieldList.get(i));
+            names[i] = nameList.get(i);
         }
     }
 
@@ -100,7 +126,7 @@ public abstract class POIExcelExportUtils<T>{
 //    }
 
 
-    public void exportData(HttpServletRequest request, List<T> data, String sheetName, String name, HttpServletResponse response, Map<String, String> map) throws Exception {
+    public void exportData(HttpServletRequest request, List<T> data, String sheetName, String name, HttpServletResponse response) throws Exception {
         try {
             //创建工作簿
             HSSFWorkbook workBook = new HSSFWorkbook();
@@ -117,49 +143,71 @@ public abstract class POIExcelExportUtils<T>{
 //            获取单元格样式
             HSSFCellStyle cellStyle0 = getHSSFCellStyle(workBook);
 
+            //设置加粗和上下左右边框
+            HSSFFont font = workBook.createFont();
+            font.setBold(true);
+            font.setFontHeightInPoints((short) 18);
+            cellStyle0.setFont(font);
+            cellStyle0.setBorderBottom(BorderStyle.THIN);
+            cellStyle0.setBorderLeft(BorderStyle.THIN);
+            cellStyle0.setBorderTop(BorderStyle.THIN);
+            cellStyle0.setBorderRight(BorderStyle.THIN);
+
             //创建标题单元格
             HSSFCell cell0 = row0.createCell(0);
             cell0.setCellStyle(cellStyle0);
             cell0.setCellValue(sheetName);
             //合并标题单元格，行和列都是从0开始计数，4个参数，分别为起始行，结束行，起始列，结束列
-            CellRangeAddress region0 = new CellRangeAddress(0, 0, 0, names.length-1);
-            sheet.addMergedRegion(region0);
+            if (names.length > 1) {
+                CellRangeAddress region0 = new CellRangeAddress(0, 0, 0, names.length - 1);
+                sheet.addMergedRegion(region0);
+            }
             // 第2行 表头
             HSSFRow row = sheet.createRow(1);
             for (int columnIndex = 0; columnIndex < names.length; columnIndex++) {
                 HSSFCell cell = row.createCell(columnIndex);
                 HSSFCellStyle cellStyle = getHSSFCellStyle(workBook);
+
+                //设置加粗和上下左右边框
+                HSSFFont headFont = workBook.createFont();
+                headFont.setBold(true);
+                cellStyle.setFont(headFont);
+                cellStyle.setBorderBottom(BorderStyle.THIN);
+                cellStyle.setBorderLeft(BorderStyle.THIN);
+                cellStyle.setBorderTop(BorderStyle.THIN);
+                cellStyle.setBorderRight(BorderStyle.THIN);
+                cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+                cellStyle.setFillForegroundColor(HSSFColor.HSSFColorPredefined.GREY_25_PERCENT.getIndex());
+
                 cell.setCellStyle(cellStyle);
                 cell.setCellValue(names[columnIndex]);
-                sheet.setColumnWidth(columnIndex, 5000);
+                if (names.length > 1) {
+                    sheet.setColumnWidth(columnIndex, 5000);
+                } else {
+                    sheet.setColumnWidth(columnIndex, 5000 * 2);
+                }
             }
+            //写入数据
             int i = 1;
             for (T item : data) {
+                HSSFCellStyle cellStyle = getHSSFCellStyle(workBook);
                 HSSFRow xssfRow = sheet.createRow(i + 1);
                 int j = 0;
                 for (; j < fields.length; j++) {
                     HSSFCell xssfCell = xssfRow.createCell(j);
-                    xssfCell.setCellStyle(cellStyle0);
+                    xssfCell.setCellStyle(cellStyle);
                     Method method = clazz.getMethod(fields[j]);
                     Object obj = method.invoke(item);
-                    if (Objects.isNull(obj)){
+                    if (Objects.isNull(obj)) {
                         obj = "";
                     }
                     xssfCell.setCellValue(obj.toString());
-                }
-                if (map != null && map.size() > 0) {
-                    for (String s : map.keySet()) {
-                        HSSFCell xssfCell = xssfRow.createCell(j);
-                        xssfCell.setCellStyle(cellStyle0);
-                        xssfCell.setCellValue(map.get(s));
-                        j++;
-                    }
                 }
                 i++;
             }
             downloadExcel(request, response, workBook, name);
         } catch (Exception e) {
-            log.error("导出数据表格信息异常：" + e.getMessage(), e);
+            log.error("导出数据表格信息异常：", e);
         }
     }
 
@@ -186,8 +234,7 @@ public abstract class POIExcelExportUtils<T>{
             workbook.write(response.getOutputStream());
             result = "导出成功";
         } catch (IOException e) {
-            e.printStackTrace();
-            log.error(e.getMessage());
+            log.error("downloadExcel失败 ： ", e);
             result = "导出失败";
         } finally {
             response.getOutputStream().close();

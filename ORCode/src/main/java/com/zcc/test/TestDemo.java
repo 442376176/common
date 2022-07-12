@@ -11,14 +11,12 @@ import org.springframework.beans.BeanUtils;
 
 import java.io.*;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -213,4 +211,55 @@ public class TestDemo {
 //        op.flush();
 //        op.close();
     }
+
+
+
+//    @Test
+//    public void testBuilderAnnotation() {
+//        TestBuilder build = TestBuilder.builder()
+//                .age("1")
+//                .name("1")
+//                .build();
+//    }
+//    @Data
+//    @Builder
+//    public class TestBuilder {
+//        private String name;
+//        private String age;
+//    }
+
+    private static volatile int i = 0;
+    @Test
+    public void test1(){
+        ReentrantLock lock = new ReentrantLock();
+        lock.lock();
+        i++;
+        lock.unlock();
+
+    }
+
+    @Test
+    public void test2(){
+//        String s = "2021-02-11";
+//        String substring = s.substring(0, s.lastIndexOf("-"));
+//        System.out.println(substring);
+        int i = 1;
+
+        long l = System.currentTimeMillis();
+        for (int j = 0; j < 100; j++) {
+            BitSet bitSet = new BitSet(Integer.MAX_VALUE - 16);
+            
+        }
+        System.out.println(System.currentTimeMillis()-l);
+        long l1 = System.currentTimeMillis();
+        for (int j = 0; j < 1000; j++) {
+            for (int k = 0; k < 1000000; k++) {
+                i++;
+            }
+        }
+        System.out.println(System.currentTimeMillis()-l1);
+    }
 }
+
+
+

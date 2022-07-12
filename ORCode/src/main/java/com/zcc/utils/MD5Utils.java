@@ -23,7 +23,7 @@ public class MD5Utils {
     }
 
     // 不带秘钥加密
-    public static String md52(String text) throws Exception {
+    public static String md52(String text){
         // 加密后的字符串
         String md5str = DigestUtils.md5Hex(text);
 //        System.out.println("MD52加密后的字符串为:" + md5str + "\t长度：" + md5str.length());
