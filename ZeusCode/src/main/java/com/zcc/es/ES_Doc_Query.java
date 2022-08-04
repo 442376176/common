@@ -6,9 +6,9 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.aggregations.AggregationBuilder;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
 
@@ -121,15 +121,85 @@ public class ES_Doc_Query {
 //            System.out.println(hit.getSourceAsString());
 //        }
 
-        // 范围查询
-        RangeQueryBuilder age = QueryBuilders.rangeQuery("age");
+//        // 范围查询
+//        RangeQueryBuilder age = QueryBuilders.rangeQuery("age");
+//
+//        age.gte(22).lte(30);
+//
+//        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+//        searchSourceBuilder.query(age);
+//        SearchRequest searchRequest = new SearchRequest();
+//        searchRequest.indices("user");
+//        searchRequest.source(searchSourceBuilder);
+//
+//
+//        SearchResponse search = esClient.search(searchRequest, RequestOptions.DEFAULT);
+//        System.out.println(search.getAggregations());
+//        System.out.println(search.getHits().getTotalHits());
+//        for (SearchHit hit : search.getHits()) {
+//            System.out.println(hit.getSourceAsString());
+//        }
+//
+//        esClient.close();
 
-        age.gte(22).lte(30);
+//        // 模糊查询
+//        FuzzyQueryBuilder fuzzyQueryBuilder = QueryBuilders.fuzzyQuery("name", "lisi4").fuzziness(Fuzziness.ONE);
+//        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+//        searchSourceBuilder.query(fuzzyQueryBuilder);
+//        SearchRequest searchRequest = new SearchRequest();
+//        searchRequest.indices("user");
+//        searchRequest.source(searchSourceBuilder);
+//
+//
+//        SearchResponse search = esClient.search(searchRequest, RequestOptions.DEFAULT);
+//        System.out.println(search.getAggregations());
+//        System.out.println(search.getHits().getTotalHits());
+//        for (SearchHit hit : search.getHits()) {
+//            System.out.println(hit.getSourceAsString());
+//        }
+//        // 高亮查询
+//        TermsQueryBuilder termsQueryBuilder = QueryBuilders.termsQuery("name", "lisi1");
+//        HighlightBuilder highlightBuilder = new HighlightBuilder();
+//        highlightBuilder.field("name").preTags("<font color='red'>").postTags("</font>");
+//        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+//        searchSourceBuilder.query(termsQueryBuilder).highlighter(highlightBuilder);
+//        SearchRequest searchRequest = new SearchRequest();
+//        searchRequest.indices("user");
+//        searchRequest.source(searchSourceBuilder);
+//
+//
+//        SearchResponse search = esClient.search(searchRequest, RequestOptions.DEFAULT);
+//        System.out.println(search.getAggregations());
+//        System.out.println(search.getHits().getTotalHits());
+//        for (SearchHit hit : search.getHits()) {
+//            System.out.println(hit.getSourceAsString());
+//        }
+        // 聚合查询
+//        // 最值
+//        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+////        AggregationBuilder builder = AggregationBuilders.max("maxAge").field("age");
+//        AggregationBuilder builder = AggregationBuilders.min("minAge").field("age");
+//        searchSourceBuilder.aggregation(builder);
+////        searchSourceBuilder.query(disMaxQueryBuilder);
+//        SearchRequest searchRequest = new SearchRequest();
+//        searchRequest.indices("user");
+//        searchRequest.source(searchSourceBuilder);
+//
+//
+//        SearchResponse search = esClient.search(searchRequest, RequestOptions.DEFAULT);
+//        System.out.println(search.getAggregations());
+//        System.out.println(search.getHits().getTotalHits());
+//        for (SearchHit hit : search.getHits()) {
+//            System.out.println(hit.getSourceAsString());
+//        }
 
-        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-        searchSourceBuilder.query(age);
+        // 分组查询
         SearchRequest searchRequest = new SearchRequest();
         searchRequest.indices("user");
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        AggregationBuilder builder = AggregationBuilders.terms("ageGroup").field("age");
+        searchSourceBuilder.aggregation(builder);
+
         searchRequest.source(searchSourceBuilder);
 
 
@@ -139,7 +209,6 @@ public class ES_Doc_Query {
         for (SearchHit hit : search.getHits()) {
             System.out.println(hit.getSourceAsString());
         }
-
         esClient.close();
     }
 }
