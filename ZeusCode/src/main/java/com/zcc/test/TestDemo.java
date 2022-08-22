@@ -259,6 +259,24 @@ public class TestDemo {
         }
         System.out.println(System.currentTimeMillis()-l1);
     }
+
+
+    @Test
+    public void test3(){
+        List<String> strings = new ArrayList<>();
+        strings.add("a");
+        strings.add("b");
+        strings.add("c");
+
+        List<String> string1 = new ArrayList<>();
+        string1.add("a");
+        string1.add("d");
+        System.out.println(strings.retainAll(string1));
+        System.out.println(strings);
+    }
+
+
+
 }
 
 

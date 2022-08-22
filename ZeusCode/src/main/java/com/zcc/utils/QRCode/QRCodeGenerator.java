@@ -26,7 +26,7 @@ public class QRCodeGenerator {
             // 嵌入二维码的图片路径
             String imgPath = "src/main/resources/1.jpg";
             // 生成的二维码的路径及名称
-            String destPath = "src/main/resources/jam.jpg";
+            String destPath = "src/main/resources/test.jpg";
             //生成二维码
             QRCodeUtil.encode(text, imgPath, destPath, true);
             // 解析二维码
