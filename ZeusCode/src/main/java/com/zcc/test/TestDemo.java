@@ -276,6 +276,13 @@ public class TestDemo {
     }
 
 
+    @Test
+    public void test4(){
+    String s = "123456";
+        String substring = s.substring(s.indexOf("1")+1, s.indexOf("3"));
+        System.out.println(substring);
+    }
+
 
 }
 

@@ -20,42 +20,42 @@
     </properties>
     <dependencies>
 
-<!--        规则引擎 QLExpress-->
-<!--        <dependency>-->
-<!--            <groupId>com.alibaba</groupId>-->
-<!--            <artifactId>QLExpress</artifactId>-->
-<!--            <version>3.2.0</version>-->
-<!--        </dependency>-->
+        <!--        规则引擎 QLExpress-->
+        <!--        <dependency>-->
+        <!--            <groupId>com.alibaba</groupId>-->
+        <!--            <artifactId>QLExpress</artifactId>-->
+        <!--            <version>3.2.0</version>-->
+        <!--        </dependency>-->
         <!--        规则引擎 drools-->
-<!--        <dependency>-->
-<!--            <groupId>org.drools</groupId>-->
-<!--            <artifactId>drools-core</artifactId>-->
-<!--            <version>7.0.0.Final</version>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.drools</groupId>-->
+        <!--            <artifactId>drools-core</artifactId>-->
+        <!--            <version>7.0.0.Final</version>-->
+        <!--        </dependency>-->
 
-<!--        <dependency>-->
-<!--            <groupId>org.drools</groupId>-->
-<!--            <artifactId>drools-compiler</artifactId>-->
-<!--            <version>7.0.0.Final</version>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.drools</groupId>-->
+        <!--            <artifactId>drools-compiler</artifactId>-->
+        <!--            <version>7.0.0.Final</version>-->
+        <!--        </dependency>-->
 
-<!--        <dependency>-->
-<!--            <groupId>org.kie</groupId>-->
-<!--            <artifactId>kie-spring</artifactId>-->
-<!--            <version>7.0.0.Final</version>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.kie</groupId>-->
+        <!--            <artifactId>kie-spring</artifactId>-->
+        <!--            <version>7.0.0.Final</version>-->
+        <!--        </dependency>-->
 
-<!--        <dependency>-->
-<!--            <groupId>org.kie</groupId>-->
-<!--            <artifactId>kie-internal</artifactId>-->
-<!--            <version>7.0.0.Final</version>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.kie</groupId>-->
+        <!--            <artifactId>kie-internal</artifactId>-->
+        <!--            <version>7.0.0.Final</version>-->
+        <!--        </dependency>-->
 
-<!--        <dependency>-->
-<!--            <groupId>org.drools</groupId>-->
-<!--            <artifactId>drools-templates</artifactId>-->
-<!--            <version>7.0.0.Final</version>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.drools</groupId>-->
+        <!--            <artifactId>drools-templates</artifactId>-->
+        <!--            <version>7.0.0.Final</version>-->
+        <!--        </dependency>-->
 
 
         <dependency>
@@ -109,22 +109,22 @@
             <scope>test</scope>
         </dependency>
         <!--        bee小蜜蜂orm-->
-<!--        <dependency>-->
-<!--            <groupId>org.teasoft</groupId>-->
-<!--            <artifactId>bee</artifactId>-->
-<!--            <version>1.9.5</version>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>org.teasoft</groupId>-->
-<!--            <artifactId>honey</artifactId>-->
-<!--            <version>1.9.5</version>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.teasoft</groupId>-->
+        <!--            <artifactId>bee</artifactId>-->
+        <!--            <version>1.9.5</version>-->
+        <!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.teasoft</groupId>-->
+        <!--            <artifactId>honey</artifactId>-->
+        <!--            <version>1.9.5</version>-->
+        <!--        </dependency>-->
         <!--for log framework,Excel(poi) -->
-<!--        <dependency>-->
-<!--            <groupId>org.teasoft</groupId>-->
-<!--            <artifactId>bee-ext</artifactId>-->
-<!--            <version>1.9.5</version>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.teasoft</groupId>-->
+        <!--            <artifactId>bee-ext</artifactId>-->
+        <!--            <version>1.9.5</version>-->
+        <!--        </dependency>-->
         <!--        二维码工具-->
         <dependency>
             <groupId>com.google.zxing</groupId>
@@ -143,22 +143,22 @@
             <version>2.2.2</version>
         </dependency>
 
-<!--        <dependency>-->
-<!--            <groupId>org.teasoft</groupId>-->
-<!--            <artifactId>bee</artifactId>-->
-<!--            <version>1.9.5</version>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>org.teasoft</groupId>-->
-<!--            <artifactId>honey</artifactId>-->
-<!--            <version>1.9.5</version>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.teasoft</groupId>-->
+        <!--            <artifactId>bee</artifactId>-->
+        <!--            <version>1.9.5</version>-->
+        <!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.teasoft</groupId>-->
+        <!--            <artifactId>honey</artifactId>-->
+        <!--            <version>1.9.5</version>-->
+        <!--        </dependency>-->
         <!--for log framework,Excel(poi) -->
-<!--        <dependency>-->
-<!--            <groupId>org.teasoft</groupId>-->
-<!--            <artifactId>bee-ext</artifactId>-->
-<!--            <version>1.9.5</version>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.teasoft</groupId>-->
+        <!--            <artifactId>bee-ext</artifactId>-->
+        <!--            <version>1.9.5</version>-->
+        <!--        </dependency>-->
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
@@ -265,12 +265,18 @@
             <artifactId>dom4j</artifactId>
             <version>2.1.3</version>
         </dependency>
+        <!--       word填充工具 -->
         <dependency>
             <groupId>com.deepoove</groupId>
             <artifactId>poi-tl</artifactId>
-            <version>1.7.3</version>
+            <version>1.9.1</version>
         </dependency>
-<!--        字节码工具-->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-scratchpad</artifactId>
+            <version>4.1.2</version>
+        </dependency>
+        <!--        字节码工具-->
         <dependency>
             <groupId>org.openjdk.jol</groupId>
             <artifactId>jol-core</artifactId>
@@ -282,7 +288,7 @@
             <version>1.9.6</version>
         </dependency>
 
-<!--        es-->
+        <!--        es-->
         <dependency>
             <groupId>org.elasticsearch</groupId>
             <artifactId>elasticsearch</artifactId>
@@ -298,11 +304,11 @@
             <artifactId>log4j-core</artifactId>
             <version>2.8.2</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>com.fasterxml.jackson.core</groupId>-->
-<!--            <artifactId>jackson-databind</artifactId>-->
-<!--            <version>2.9.9</version>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>com.fasterxml.jackson.core</groupId>-->
+        <!--            <artifactId>jackson-databind</artifactId>-->
+        <!--            <version>2.9.9</version>-->
+        <!--        </dependency>-->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
