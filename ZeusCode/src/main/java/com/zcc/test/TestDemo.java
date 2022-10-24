@@ -1,5 +1,6 @@
 package com.zcc.test;
 
+import com.zcc.JUC.interviewQuestions.SleepHelper;
 import com.zcc.entity.User;
 import com.zcc.entity.User1;
 import com.zcc.utils.CollectionUtils;
@@ -8,6 +9,7 @@ import com.zcc.utils.idCardUtil.IDCardUtils;
 import lombok.Data;
 import org.junit.Test;
 import org.springframework.beans.BeanUtils;
+import org.springframework.util.StopWatch;
 
 import java.io.*;
 import java.net.URLEncoder;
@@ -279,11 +281,34 @@ public class TestDemo {
     @Test
     public void test4(){
     String s = "123456";
-        String substring = s.substring(s.indexOf("1")+1, s.indexOf("3"));
-        System.out.println(substring);
+        String[] split = s.split(",");
+        System.out.println(split[0]);
     }
 
+    @Test
+    public void test5(){
+        StopWatch watch = new StopWatch();
+        watch.start();
+        SleepHelper.sleepMilli(1000);
+        watch.stop();
+        System.out.println(watch);
+        watch.start();
+        SleepHelper.sleepMilli(1000);
+        watch.stop();
+        System.out.println(watch);
+    }
 
+    @Test
+    public void test6(){
+      List<Integer> a = new ArrayList<>();
+        List<Integer> b = new ArrayList<>();
+        a.add(1);
+        a.add(2);
+        b.add(1);
+//        b.add(2);
+        b.add(3);
+        System.out.println(a.removeAll(b));
+    }
 }
 
 

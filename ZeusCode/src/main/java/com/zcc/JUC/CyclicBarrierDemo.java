@@ -12,7 +12,7 @@ import java.util.concurrent.CyclicBarrier;
  */
 public class CyclicBarrierDemo {
     // 创建固定值
-    private static final int LZ = 7;
+    private static final int LZ = 6;
 
     public static void main(String[] args) {
         // 创建CyclicBarrier
@@ -22,7 +22,7 @@ public class CyclicBarrierDemo {
         });
 
         // 集齐龙珠过程
-        for (int i = 1; i <= 7; i++) {
+        for (int i = 1; i <= 18; i++) {
             new Thread(() -> {
                 System.out.println(Thread.currentThread().getName() + "星龙被收集到了");
 

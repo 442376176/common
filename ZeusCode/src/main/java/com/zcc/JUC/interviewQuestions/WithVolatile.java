@@ -134,8 +134,7 @@ public class WithVolatile {
     public static void main(String[] args) {
 
 
-        thread =
-                new Thread(() -> {
+        thread = new Thread(() -> {
                     for (int i = 0; i < 10; i++) {
                         t.add(new Object());
                         System.out.println("add " + i);
@@ -147,8 +146,7 @@ public class WithVolatile {
                 }, "add1");
         thread.start();
 
-        thread1
-                = new Thread(() -> {
+        thread1 = new Thread(() -> {
             LockSupport.park();
             System.out.println("结束");
             LockSupport.unpark(thread);

@@ -1,7 +1,5 @@
 package com.zcc.utils;
 
-import org.springframework.beans.BeanUtils;
-
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -34,7 +32,7 @@ public class StreamUtil {
 
 
     public static <T, R> Map<R, List<T>> getMap(Collection<T> collection, Function<T, R> function) {
-        if (collection.isEmpty() || Objects.isNull(collection)) {
+        if (collection == null || collection.isEmpty()) {
             return null;
         }
         Map<R, List<T>> map = collection
@@ -43,8 +41,18 @@ public class StreamUtil {
         return map;
     }
 
+    public static <T, R, V> Map<R, List<V>> getMap(Collection<T> collection, Function<T, R> function, Function<T, V> getField) {
+        if (collection == null || collection.isEmpty()) {
+            return null;
+        }
+        Map<R, List<V>> map = collection
+                .stream()
+                .collect(Collectors.groupingBy(t -> function.apply(t), Collectors.mapping(t -> getField.apply(t), Collectors.toList())));
+        return map;
+    }
+
     public static <T, R> List<R> getField(Collection<T> collection, Function<T, R> function) {
-        if (collection.isEmpty() || Objects.isNull(collection)) {
+        if (collection == null || collection.isEmpty()) {
             return null;
         }
         List<R> collect = collection
@@ -55,8 +63,20 @@ public class StreamUtil {
         return collect;
     }
 
+    public static <T, R,K> List<R> getOtherTypeField(Collection<T> collection, Function<T, K> functionA,Function<K, R> functionB) {
+        if (collection == null || collection.isEmpty()) {
+            return null;
+        }
+        List<R> collect = collection
+                .stream()
+                .map(item->functionB.apply(functionA.apply(item)))
+                .distinct()
+                .collect(Collectors.toList());
+        return collect;
+    }
+
     public static <T, R> List<R> getField(Collection<T> collection, Function<T, R> function, Predicate<T> predicate) {
-        if (collection.isEmpty() || Objects.isNull(collection)) {
+        if (collection == null || collection.isEmpty()) {
             return null;
         }
         List<R> collect = collection
@@ -70,7 +90,7 @@ public class StreamUtil {
 
 
     public static <T, R> List<R> getNestField(Collection<T> collection, Function<T, Stream<R>> function) {
-        if (collection.isEmpty() || Objects.isNull(collection)) {
+        if (collection == null || collection.isEmpty()) {
             return null;
         }
         List<R> collect = collection
@@ -82,7 +102,7 @@ public class StreamUtil {
     }
 
     public static <T, R> List<R> getNestField(Collection<T> collection, Function<T, Stream<R>> function, Predicate<T> predicate) {
-        if (collection.isEmpty() || Objects.isNull(collection)) {
+        if (collection == null || collection.isEmpty()) {
             return null;
         }
         List<R> collect = collection
@@ -93,22 +113,8 @@ public class StreamUtil {
                 .collect(Collectors.toList());
         return collect;
     }
-
-
-
-    public static <T, R> void getCopyList(Collection<T> collectionA, Collection<R> collectionB, Class<R> rClass) throws Exception {
-        if (collectionA.isEmpty() || Objects.isNull(collectionA)) {
-            throw new NullPointerException();
-        }
-        for (T t : collectionA) {
-            R r = rClass.newInstance();
-            BeanUtils.copyProperties(t, r);
-            collectionB.add(r);
-        }
-    }
-
     public static <T> List<T> filter(Collection<T> collection, Predicate<T> predicate) {
-        if (collection.isEmpty() || Objects.isNull(collection)) {
+        if (collection == null || collection.isEmpty()) {
             return null;
         }
         return collection.stream()
@@ -118,24 +124,30 @@ public class StreamUtil {
 
 
     public static <T> List<T> strToList(String str, Function<String, T> function) {
-        if (str.isEmpty() || str == null) {
+        if (str == null || str.isEmpty()) {
             return null;
         }
         return Arrays.stream(str.split(",")).distinct().map(function).collect(Collectors.toList());
     }
 
     public static <T> String collectionToStr(Collection<T> collection) {
-        if (collection.isEmpty() || collection == null) {
+        if (collection == null || collection.isEmpty()) {
             return null;
         }
         return collection.stream().distinct().map(String::valueOf).collect(Collectors.joining(","));
     }
 
     public static <T> boolean isIntersection(Collection<T> a, Collection<T> b) {
+        if (a == null || a.isEmpty() || b == null || b.isEmpty()) {
+            return Boolean.FALSE;
+        }
         return a.stream().anyMatch(item -> b.contains(item));
     }
 
     public static <T> boolean isContains(Collection<T> a, Collection<T> b) {
+        if (a == null || a.isEmpty() || b == null || b.isEmpty()) {
+            return Boolean.FALSE;
+        }
         return b.stream().allMatch(item -> a.contains(item));
     }
 

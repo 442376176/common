@@ -18,7 +18,7 @@ public class CountDownLatchDemo {
         // 创建CountDownLatch对象，设置初始值
         CountDownLatch countDownLatch = new CountDownLatch(6);
 
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < 10; i++) {
             int finalI = i;
             new Thread(() -> {
 //                count.compareAndSet(finalI-1 , finalI);

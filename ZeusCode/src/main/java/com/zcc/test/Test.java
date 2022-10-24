@@ -8,7 +8,7 @@ package com.zcc.test;
  * @version:
  * @Describe:
  */
-public class TEst {
+public class Test {
     public static void main(String[] args) {
         System.out.println(isIdCardNumber("320321199610050413"));
     }
